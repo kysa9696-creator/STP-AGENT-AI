@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>KT DS STP AI Agent</title>
+  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+</head>
+<body>
+  <!-- ===== HEADER ===== -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo-area">
+        <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+        <div class="logo-text">
+          <span class="logo-main">KT DS</span>
+          <span class="logo-sub">STP AI Agent</span>
+        </div>
+      </div>
+      <nav class="header-nav">
+        <button class="nav-btn active" data-tab="chat"><i class="fa-solid fa-comments"></i> 문의 대응</button>
+        <button class="nav-btn" data-tab="history"><i class="fa-solid fa-clock-rotate-left"></i> 대화 이력</button>
+        <button class="nav-btn" data-tab="guide"><i class="fa-solid fa-circle-info"></i> 이용 안내</button>
+      </nav>
+      <div class="header-user">
+        <button class="theme-toggle-btn" id="themeToggleBtn" title="테마 전환">
+          <i class="fa-solid fa-moon"></i>
+        </button>
+        <div class="user-status"><span class="status-dot"></span>온라인</div>
+        <div class="api-status-indicator" id="apiStatus">
+          <span class="status-dot"></span>
+          <span class="api-status-text">STP AI 연결됨</span>
+        </div>
+        <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
+      </div>
+    </div>
+  </header>
+
+  <main class="main-container">
+    <section class="tab-section active" id="tab-chat">
+      <div class="chat-layout">
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <h3><i class="fa-solid fa-layer-group"></i> 업무 카테고리</h3>
+          </div>
+          <!-- 업무 카테고리 start -->
+          <!-- 기존 메뉴
+          <ul class="category-list">
+            <li class="category-item active" data-category="all">
+              <i class="fa-solid fa-grip"></i>
+              <span>전체 문의</span>
+              <span class="badge">전체</span>
+            </li>
+            <li class="category-item sap-category" data-category="sap_mm">
+              <i class="fa-solid fa-cubes"></i>
+              <span>SAP MM 모듈</span>
+              <span class="badge sap">SAP</span>
+            </li>
+            <li class="category-item" data-category="data">
+              <i class="fa-solid fa-table"></i>
+              <span>Table & T-code</span>
+            </li>
+            <li class="category-item" data-category="system">
+              <i class="fa-solid fa-building-circle-arrow-right"></i>
+              <span>신설법인 프로세스</span>
+              <span class="badge">Netcore,P&M</span>
+            </li>
+            <li class="category-item" data-category="account">
+              <i class="fa-solid fa-server"></i>
+              <span>시스템</span>
+            </li>
+            <li class="category-item" data-category="deploy">
+              <i class="fa-solid fa-network-wired"></i>
+              <span>MM 연동&배치</span>
+            </li>
+            <li class="category-item" data-category="security">
+              <i class="fa-solid fa-address-book"></i>
+              <span>담당자 연락처</span>
+            </li>
+            <li class="category-item" data-category="etc">
+              <i class="fa-solid fa-ellipsis"></i>
+              <span>기타 문의</span>
+            </li>
+          </ul>
+          -->
+          <ul class="category-list">
+            <li class="category-item active" data-category="all">
+              <i class="fa-solid fa-grip"></i>
+              <span>전체 문의</span>
+              <span class="badge">전체</span>
+            </li>
+            <li class="category-item sap-category" data-category="sap_mm">
+              <i class="fa-solid fa-cubes"></i>
+              <span>SAP MM 모듈</span>
+              <span class="badge sap">SAP</span>
+            </li>
+            <li class="tree-item">
+              <div class="tree-title">
+                <i class="fa-solid fa-building-circle-arrow-right"></i>
+                <span>그룹사</span>
+                <i class="fa-solid fa-chevron-down arrow"></i>
+              </div>
+              <ul class="tree-menu">
+                <li class="tree-item group-company" data-company="netcore-pm" data-category="netcore-pm">
+                  <div class="tree-title">
+                    <span>kt netcore | kt p&m</span>
+                  </div>
+                </li>
+                <li class="tree-item group-company" data-company="cloud">
+                  <div class="tree-title">
+                    <span>kt cloud</span>
+                  </div>
+                </li>
+                <li class="tree-item group-company" data-company="alpha" data-category="alpha">
+                  <div class="tree-title">
+                    <span>kt alpha</span>
+                  </div>
+                </li>
+                <li class="tree-item group-company" data-company="skylife">
+                  <div class="tree-title">
+                    <span>kt skylife</span>
+                  </div>
+                </li>
+                <li class="tree-item group-company" data-company="sat">
+                  <div class="tree-title">
+                    <span>kt sat</span>
+                  </div>
+                </li>
+                <li class="tree-item group-company" data-company="ds">
+                  <div class="tree-title">
+                    <span>kt ds</span>
+                  </div>
+                </li>
+                <li class="tree-item group-company" data-company="estate">
+                  <div class="tree-title">
+                    <span>kt estate</span>
+                  </div>
+                </li>
+                <li class="tree-item group-company" data-company="engcore">
+                  <div class="tree-title">
+                    <span>kt engcore</span>
+                  </div>
+                </li>
+              </ul>
+            </li>
+                 <li class="category-item" data-category="account">
+                 <i class="fa-solid fa-desktop"></i>
+                 <span>시스템</span>
+                 </li>
+            <li class="category-item" data-category="works">
+              <i class="fa-solid fa-user"></i>
+              <span>통합 복무</span>
+            </li>
+            <li class="category-item" data-category="shortcut">
+              <i class="fa-solid fa-users"></i>
+              <span>공통업무</span>
+            </li>
+            <li class="category-item" data-category="capability">
+              <i class="fa-solid fa-graduation-cap"></i>
+              <span>역량강화</span>
+            </li>
+            <li class="category-item" data-category="etc">
+              <i class="fa-solid fa-ellipsis"></i>
+              <span>기타 문의</span>
+            </li>
+          </ul>
+          <!-- 업무 카테고리 end -->
+          <div class="sidebar-stats">
+            <h4><i class="fa-solid fa-chart-bar"></i> 오늘의 현황</h4>
+            <div class="stat-grid">
+              <div class="stat-item"><span class="stat-num" id="stat-total">0</span><span class="stat-label">총 문의</span></div>
+              <div class="stat-item"><span class="stat-num green" id="stat-resolved">0</span><span class="stat-label">처리 완료</span></div>
+              <div class="stat-item"><span class="stat-num red" id="stat-pending">0</span><span class="stat-label">처리 중</span></div>
+              <div class="stat-item"><span class="stat-num orange" id="stat-avg">0s</span><span class="stat-label">평균 응답</span></div>
+            </div>
+          </div>
+          <div class="new-chat-btn-wrap">
+            <button class="new-chat-btn" id="newChatBtn"><i class="fa-solid fa-plus"></i> 새 대화 시작</button>
+          </div>
+        </aside>
+        <div class="chat-main">
+          <div class="chat-topbar">
+            <div class="chat-info">
+              <div class="agent-avatar"><i class="fa-solid fa-robot"></i></div>
+              <div class="agent-info">
+                <span class="agent-name">STP AI Agent</span>
+                <span class="agent-desc">KT DS STP · SAP MM 업무 전문 AI &nbsp;·&nbsp; <i class="fa-solid fa-microchip" style="color:var(--kt-red)"></i> 오늘도 당신을 응원합니다!</span>
+              </div>
+            </div>
+            <div class="chat-actions">
+              <button class="action-btn" id="exportBtn" title="대화 내보내기"><i class="fa-solid fa-file-export"></i></button>
+              <button class="action-btn" id="clearBtn" title="대화 초기화"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>
+          <div class="chat-messages" id="chatMessages">
+            <div class="welcome-card">
+              <div class="welcome-icon"><i class="fa-solid fa-robot"></i></div>
+              <h2>안녕하세요! STP AI Agent 입니다.</h2>
+              <p><strong>SAP MM</strong> 및 <strong>KT DS STP</strong> 업무 관련 문의사항을 자유롭게 질문해 주세요.<br/>구매 프로세스, 자재 관리, 신설법인 프로세스, 계정/권한 등 다양한 업무를 지원합니다.<br/>STP AI 에이전트가 실시간으로 정확한 답변을 제공합니다.</p>
+              <div class="quick-btns">
+                <button class="quick-btn" data-msg="SAP MM(Material Management) 모듈에 대해 알려주세요"><i class="fa-solid fa-cubes"></i> SAP MM 모듈</button>
+                <button class="quick-btn" data-msg="STP Table & T-code 알려주세요"><i class="fa-solid fa-table"></i> Table & T-code</button>
+                <button class="quick-btn" data-msg="신설법인 (Netcore, P&M) 프로세스 알려주세요"><i class="fa-solid fa-building-circle-arrow-right"></i> 신설법인 프로세스</button>
+                <button class="quick-btn" data-msg="STP에서 업무할 때 주로 사용하는 연계 시스템에 대해서 알려주세요"><i class="fa-solid fa-desktop"></i> 시스템</button>
+                <button class="quick-btn" data-msg="MM RFC & 배치에 대해 알려주세요"><i class="fa-solid fa-network-wired"></i> MM RFC & 배치</button>
+                <button class="quick-btn" data-msg="STP 운영 담당부서를 알려주세요"><i class="fa-solid fa-address-book"></i> STP 담당자 연락처</button>
+              </div>
+            </div>
+          </div>
+          <div class="chat-input-area">
+            <div class="attached-files" id="attachedFiles" style="display:none;"></div>
+            <div class="input-toolbar">
+              <button class="tool-btn" id="fileAttachBtn" title="파일 첨부"><i class="fa-solid fa-paperclip" style="color:#E2002A;"></i></button>
+              <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.zip,.ppt,.pptx" style="display:none;" />
+              <button class="tool-btn" id="imageAttachBtn" title="스크린샷 첨부"><i class="fa-solid fa-image"></i></button>
+              <input type="file" id="imageInput" accept="image/*" style="display:none;" />
+            </div>
+            <div class="input-row">
+              <textarea id="userInput" class="chat-input" placeholder="SAP MM 또는 STP 업무 관련 질문을 입력하세요... (Shift+Enter: 줄바꿈, 이미지 Ctrl+V 붙여넣기 가능)" rows="1"></textarea>
+              <button class="send-btn" id="sendBtn"><i class="fa-solid fa-paper-plane"></i></button>
+            </div>
+            <div class="input-footer">
+              <span class="char-count"><span id="charCount">0</span> / 10,000</span>
+              <span class="input-hint"><i class="fa-solid fa-microchip" style="color:var(--kt-red)"></i> STP AI 에이전트 연동 &nbsp;·&nbsp; Enter 로 전송 · Shift+Enter 로 줄바꿈 · Ctrl+V 이미지 붙여넣기</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    <section class="tab-section" id="tab-history">
+      <div class="history-container">
+        <div class="page-header">
+          <h2><i class="fa-solid fa-clock-rotate-left"></i> 대화 이력</h2>
+          <p>이전에 나눈 문의 대화 내역을 확인할 수 있습니다.</p>
+        </div>
+        <div class="history-filter">
+          <input type="text" class="filter-input" placeholder="문의 내용 검색..." id="historySearch"/>
+          <select class="filter-select" id="historyCategory">
+            <option value="all">전체 카테고리</option>
+            <option value="sap_mm">SAP MM</option>
+            <option value="system">신설법인 프로세스</option>
+            <option value="account">계정/권한</option>
+            <option value="network">네트워크</option>
+            <option value="deploy">배포/릴리즈</option>
+          </select>
+          <select class="filter-select" id="historyDate">
+            <option value="all">전체 기간</option>
+            <option value="today">오늘</option>
+            <option value="week">최근 1 주일</option>
+            <option value="month">최근 1 개월</option>
+          </select>
+        </div>
+        <div class="history-list" id="historyList"></div>
+      </div>
+    </section>
+    <section class="tab-section" id="tab-guide">
+      <div class="guide-container">
+        <div class="page-header">
+          <h2><i class="fa-solid fa-circle-info"></i> 이용 안내</h2>
+          <p>STP AI Agent 사용 방법 및 주요 기능을 안내합니다.</p>
+        </div>
+        <div class="guide-grid">...</div>
+      </div>
+    </section>
+  </main>
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="loading-spinner">
+      <div class="spinner-ring"></div>
+      <p>AI 가 답변을 생성하고 있습니다...</p>
+    </div>
+  </div>
+  <div class="toast-container" id="toastContainer"></div>
+  
+  <!-- Extracted Text Preview Modal -->
+  <div class="modal-overlay" id="extractPreviewModal" style="display:none;">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3><i class="fa-solid fa-file-lines"></i> 추출된 텍스트 미리보기</h3>
+        <button class="modal-close" id="closePreviewBtn">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="preview-tabs">
+          <button class="preview-tab active" data-tab="preview">미리보기</button>
+          <button class="preview-tab" data-tab="edit">편집</button>
+        </div>
+        <div class="preview-content" id="previewContent">
+          <div class="preview-view" id="previewView"></div>
+          <textarea class="preview-editor" id="previewEditor" style="display:none;"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn" id="copyTextBtn"><i class="fa-solid fa-copy"></i> 복사</button>
+        <button class="modal-btn primary" id="applyTextBtn"><i class="fa-solid fa-check"></i> 적용하고 전송</button>
+      </div>
+    </div>
+  </div>
+  <!-- Image Preview Modal (Lightbox) -->
+  <div class="modal-overlay" id="imagePreviewModal" style="display:none;">
+    <div class="image-preview-container">
+      <button class="image-preview-close" id="closeImagePreviewBtn">&times;</button>
+      <button class="image-preview-nav image-preview-prev" id="prevImageBtn"><i class="fa-solid fa-chevron-left"></i></button>
+      <button class="image-preview-nav image-preview-next" id="nextImageBtn"><i class="fa-solid fa-chevron-right"></i></button>
+      <img class="image-preview-img" id="imagePreviewImg" src="" alt="미리보기" />
+      <div class="image-preview-counter" id="imagePreviewCounter"></div>
+    </div>
+  </div>
+  <!-- Document Text Extraction Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+  <!-- OCR Library for Image Text Recognition -->
+  <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+  <script src="js/app.js?v=2.0.1"></script>
+</body>
+</html>
