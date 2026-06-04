@@ -66,7 +66,7 @@ const state = {
         themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
         themeToggleBtn.title = '우주 (다크) 테마로 전환';
         localStorage.setItem('theme', 'light');
-        showToast('밝은 테마로 전환되었습니다 ☀️', 'info');
+        showToast('밝은 테마로 전환되었습니다람쥐 ☀️', 'info');
       }
     });
   }
