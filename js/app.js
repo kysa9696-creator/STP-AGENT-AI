@@ -66,7 +66,7 @@ const state = {
         themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
         themeToggleBtn.title = '우주 (다크) 테마로 전환';
         localStorage.setItem('theme', 'light');
-        showToast('밝은 테마로 전환되었습니다람쥐 ☀️', 'info');
+        showToast('밝은 테마로 전환되었습니다 ☀️', 'info');
       }
     });
   }
@@ -210,11 +210,13 @@ document.addEventListener("DOMContentLoaded", () => {
         // chat messages 완전 clear 후 새로운 welcome 카드 생성
         const chatMessages = document.getElementById("chatMessages");
         if (chatMessages) {
-          // 현재 카테고리 저장 (kt alpha, kt netcore | kt p&m 일 경우)
+          // 현재 카테고리 저장 (kt alpha, kt netcore | kt p&m, kt cloud 일 경우)
           if (companyName === "alpha") {
             chatMessages.dataset.currentCategory = "alpha";
           } else if (companyName === "netcore-pm") {
             chatMessages.dataset.currentCategory = "netcore-pm";
+          } else if (companyName === "cloud") {
+            chatMessages.dataset.currentCategory = "cloud";
           }
           
           // netcore-pm 의 경우 신설법인 프로세스 버튼으로 변경
@@ -540,7 +542,7 @@ function showCapabilityCards() {
 /* ============================================================
   STP 운영 담당자 연락처 키워드 감지 및 즉시 응답
    ============================================================ */
-const CONTACT_KEYWORDS = ['담당자','연락처','담당부서','운영 담당','운영담당','담당자 연락','책임자'];
+const CONTACT_KEYWORDS = ['STP 담당자','STP 연락처','STP 담당부서','STP 운영 담당','STP 운영담당','STP 담당자 연락','STP 책임자'];
 
 function isContactQuery(text) {
   // "시스템" 단독 단어는 담당자 연락처로 처리하지 않음
@@ -553,7 +555,7 @@ function isContactQuery(text) {
   }
   
   // 담당자/연락처 키워드가 포함되면 무조건 담당자 연락처로 처리 (우선순위 최상)
-  const contactKeywords = ['담당자','담당부서','운영 담당','운영담당' ];
+  const contactKeywords = ['STP 담당자','STP 담당부서','STP 운영 담당','STP 운영담당' ];
   if (contactKeywords.some(function(kw) { return text.includes(kw); })) {
     return true;
   }
@@ -752,62 +754,303 @@ function buildNetcorePmContactAnswer() {
   return netcorePmContact;
 }
 
+function buildKtCloudContactAnswer() {
+  const ktCloudContact =
+    '<strong>📋 협력사/ITO담당자 안내/연락처</strong><br/>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:13px;">' +
+      '<thead>' +
+        '<tr style="background:var(--kt-red);color:#fff;">' +
+          '<th style="padding:8px 12px;text-align:left;border-radius:4px 0 0 0;">모듈</th>' +
+          '<th style="padding:8px 12px;text-align:left;">업무</th>' +
+          '<th style="padding:8px 12px;text-align:left;">ITO (협력사)</th>' +
+          '<th style="padding:8px 12px;text-align:left;border-radius:0 4px 0 0;">KT DS ITO</th>' +
+        '</tr>' +
+      '</thead>' +
+      '<tbody>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>FI</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">AP/AR/GL</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">박병철 (010-2557-6024)<br/>신정우 / 백종환</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">재무DX 서비스팀</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>FI</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">고정자산관리</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>펌뱅킹</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">자금 관리(펌뱅킹)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">최정섭 (010-3542-5112)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>Bizplay</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">법인카드 관리 (Bizplay)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">권재순 (010-2642-1243)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>MM</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">물자/공사/용역 구매</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">김나나</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">물류 DX 서비스팀 조혜승</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>PS</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">프로젝트 관리</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">물류 DX 서비스팀 백민아, 이상호</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>PM</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">설비관리(바코드)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">물류 DX 서비스팀 천혜연</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>CO/FM</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">손익/예산 관리</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">재무DX 서비스팀 박재운 / 원승희</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>CO/FM</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">재원(FM)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>PPM</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">투자사업계획 관리</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>HR</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">인사/조직,연동</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">인한얼 과장 (010-4188-6982)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>BC</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">BC</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">현재유, 신동민</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">재무DX 서비스팀 장웅재</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>GRC</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">권한,계정, 감사대응</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">송근배 과장 (010-8961-9421)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>MDM</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">MDM</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">조승현 차장 (애버커스)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">Biz DX서비스팀 송은주</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>바코드</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">바코드</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">신현명 차장 (010-4517-2997)<br/>오규환 (애버커스)</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>EAI</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">EAI</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">Biz DX서비스팀 최승희, 정다운</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;"><strong>SRM</strong></td>' +
+          '<td style="padding:8px 12px;">SRM</td>' +
+          '<td style="padding:8px 12px;">이주헌 과장</td>' +
+          '<td style="padding:8px 12px;"></td>' +
+        '</tr>' +
+      '</tbody>' +
+    '</table>';
+
+  return ktCloudContact;
+}
+
 /* ============================================================
     STP 연계 시스템 키워드 감지 및 즉시 응답
     ============================================================ */
-const SYSTEM_KEYWORDS = ['STP 연계 시스템', 'STP연계시스템', 'STP시스템', 'STP 시스템', 'stp연계시스템', 'stp 연계 시스템'  ];
+const SYSTEM_KEYWORDS = ['STP 연계 시스템', 'STP연계시스템', 'STP시스템', 'STP 시스템', 'stp연계시스템', 'stp 연계 시스템', 'bpm', 'eai', 'srm', 'easy erp', 'easyerp', 'itsm', 'it sm', 'ep ', '연계 시스템', '시스템 주소', '시스템 url', '시스템 링크', '시스템 접속', 'bpm 주소', 'bpm url', 'bpm 링크', 'bpm 접속', 'eai 주소', 'eai url', 'srm 주소', 'srm url', 'erp 주소', 'erp url', 'itsm 주소', 'itsm url', 'ep 주소', 'ep url', '그룹메일', 'groupmail'];
+
+/**
+ * URL/접속 의도 감지 키워드
+ * 이 키워드가 없으면 시스템 설명 질문 → AI에 넘김
+ */
+const SYSTEM_URL_INTENT_KEYWORDS = [
+  '주소', 'url', '링크', '접속', '로그인', '홈페이지', '사이트', 'web', 'portal',
+  'url 주소', '접속 주소', '접속 링크', '로그인 주소', '홈페이지 주소',
+  '어디서', '어디서 접속', '어디서 로그인'
+];
+
+/**
+ * 설명/정의 의도 감지 키워드
+ * 이 키워드가 있으면 고정답변 X → AI에 넘김
+ */
+const SYSTEM_EXPLANATION_KEYWORDS = [
+  '어떤 시스템', '뭐야', '뭐지', '무엇이야', '무엇이지', '설명', '설명해', '설명해줘',
+  '설명해주세요', '의미', '뜻', '기능', '역할', '용도', '목적', '차이', '차이점',
+  '비교', '어떤 차이', '어떤 의미', '어떤 역할', '어떤 기능',
+  'is what', 'what is', 'what does', 'difference', 'explain'
+];
 
 function isSystemQuery(text) {
-  const lowerText = text.toLowerCase();
-  // "시스템" 단독으로는 시스템 카테고리가 아님 (담당자 연락처 또는 기타로 처리)
-  if (lowerText.trim() === '시스템') return false;
-  return SYSTEM_KEYWORDS.some(function(kw) { return lowerText.includes(kw.toLowerCase()); });
+  const lowerText = text.toLowerCase().trim();
+
+  // "시스템" 단독으로는 시스템 카테고리가 아님
+  if (lowerText === '시스템') return false;
+
+  // 시스템 키워드가 포함되어야 함
+  var hasSystemKeyword = SYSTEM_KEYWORDS.some(function(kw) { return lowerText.includes(kw.toLowerCase()); });
+  if (!hasSystemKeyword) return false;
+
+  // 설명/정의 의도면 고정답변 X → AI에 넘김
+  if (SYSTEM_EXPLANATION_KEYWORDS.some(function(kw) { return lowerText.includes(kw); })) {
+    return false;
+  }
+
+  // "STP 연계 시스템" / "연계 시스템" 등 전체 안내 요청은 항상 true
+  var fullListKeywords = ['STP 연계 시스템', 'STP연계시스템', 'STP시스템', 'STP 시스템', 'stp연계시스템', 'stp 연계 시스템', '연계 시스템'];
+  if (fullListKeywords.some(function(kw) { return lowerText.includes(kw); })) {
+    return true;
+  }
+
+  // 개별 시스템 키워드 + URL/접속 의도 키워드가 함께 있으면 true
+  var hasUrlIntent = SYSTEM_URL_INTENT_KEYWORDS.some(function(kw) { return lowerText.includes(kw); });
+  if (hasUrlIntent) return true;
+
+  // 개별 시스템 키워드만 있고 URL 의도도, 설명 의도도 없으면 → AI에 넘김
+  return false;
 }
 
-function buildSystemAnswer() {
-  return '<strong>🖥️ STP 연계 시스템 안내</strong><br/><br/>' +
-    '<div style="background:var(--info-bg-light, #E8F4FD);border-left:4px solid #2574A9;padding:12px 16px;border-radius:8px;margin-bottom:16px;">' +
-    '<strong>📌 주요 연계 시스템:</strong> BPM, EAI, EASY ERP, SRM, ITS</div>' +
-    
-    '<h4 style="color:var(--kt-red);margin:16px 0 10px 0;font-size:15px;">🔗 EAI (Enterprise Application Integration)</h4>' +
-    '<div style="background:var(--bg-secondary, #FFFDF9);border:1px solid var(--border-color);border-radius:8px;padding:14px;margin-bottom:12px;">' +
-    '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
-    '<li><strong>EAI 개발:</strong> <a href="http://10.217.52.41:8801/EAIAdmin/main/main.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://10.217.52.41:8801/EAIAdmin/main/main.jsp</a></li>' +
-    '<li><strong>EAI 품질:</strong> <a href="http://10.217.45.82:8811/EAIAdmin/main/main.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://10.217.45.82:8811/EAIAdmin/main/main.jsp</a></li>' +
-    '<li><strong>EAI 운영:</strong> <a href="http://10.220.18.11:9011/EAIAdmin/main/main.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://10.220.18.11:9011/EAIAdmin/main/main.jsp</a></li>' +
-    '</ul></div>' +
-    
-    '<h4 style="color:var(--kt-red);margin:16px 0 10px 0;font-size:15px;">📝 BPM (Business Process Management)</h4>' +
-    '<div style="background:var(--bg-card, #F5EFE6);border:1px solid var(--border-color);border-radius:8px;padding:14px;margin-bottom:12px;">' +
-    '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
-    '<li><strong>BPM 개발:</strong> <a href="http://bpdev.kt.com:8103/bizflow/KTFBPM/ktf_login2.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpdev.kt.com:8103/bizflow/KTFBPM/ktf_login2.jsp</a></li>' +
-    '<li><strong>BPM 품질:</strong> <a href="http://bpdev.kt.com/bizflow/KTFBPM/ktf_login2.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpdev.kt.com/bizflow/KTFBPM/ktf_login2.jsp</a></li>' +
-    '</ul></div>' +
-    
-    '<h4 style="color:var(--kt-red);margin:16px 0 10px 0;font-size:15px;">💼 Easy ERP</h4>' +
-    '<div style="background:var(--bg-secondary, #FFFDF9);border:1px solid var(--border-color);border-radius:8px;padding:14px;margin-bottom:12px;">' +
-    '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
-    '<li><strong>Easy ERP:</strong> <a href="http://keddev.kt.com/ERP/cm/view/CMV0010" target="_blank" style="color:#2574A9;text-decoration:none;">http://keddev.kt.com/ERP/cm/view/CMV0010</a></li>' +
-    '</ul></div>' +
-    
-    '<h4 style="color:var(--kt-red);margin:16px 0 10px 0;font-size:15px;">🛠️ ITS (IT Service Management)</h4>' +
-    '<div style="background:var(--bg-card, #F5EFE6);border:1px solid var(--border-color);border-radius:8px;padding:14px;margin-bottom:12px;">' +
-    '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
-    '<li><strong>사용자:</strong> <a href="https://itsm.ktds.co.kr/kt/index.do" target="_blank" style="color:#2574A9;text-decoration:none;">https://itsm.ktds.co.kr/kt/index.do</a></li>' +
-    '<li><strong>운영자:</strong> <a href="http://itsm.ktds.co.kr/oper/index.do" target="_blank" style="color:#2574A9;text-decoration:none;">http://itsm.ktds.co.kr/oper/index.do</a></li>' +
-    '</ul></div>' +
-    
-    '<h4 style="color:var(--kt-red);margin:16px 0 10px 0;font-size:15px;">🤝 SRM (Supplier Relationship Management)</h4>' +
-    '<div style="background:var(--bg-secondary, #FFFDF9);border:1px solid var(--border-color);border-radius:8px;padding:14px;margin-bottom:12px;">' +
-    '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
-    '<li><strong>SRM:</strong> <a href="https://srmdev.kt.com/kt_b0i8t6s2r1m_nigol.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">https://srmdev.kt.com/kt_b0i8t6s2r1m_nigol.jsp</a></li>' +
-    '</ul></div>' +
-    
-    '<br/><hr style="border:0;border-top:1px solid var(--border-color);margin:16px 0;">' +
+/**
+ * 사용자가 묻는 시스템 유형 감지
+ * 'bpm' | 'eai' | 'srm' | 'easy_erp' | 'itsm' | 'ep' | 'groupmail' | 'all'
+ */
+function detectSystemType(text) {
+  const lower = text.toLowerCase();
+
+  // 개별 시스템 키워드 우선 매칭
+  if (/bpm/.test(lower)) return 'bpm';
+  if (/eai/.test(lower)) return 'eai';
+  if (/srm/.test(lower)) return 'srm';
+  if (/easy[\s_]*erp|easyerp/.test(lower)) return 'easy_erp';
+  if (/itsm|it[\s_]*sm/.test(lower)) return 'itsm';
+  if (/\bep\b/.test(lower)) return 'ep';
+  if (/그룹메일|groupmail/.test(lower)) return 'groupmail';
+
+  // 전체 시스템 안내
+  return 'all';
+}
+
+function buildSystemAnswer(systemType) {
+  systemType = systemType || 'all';
+
+  var systemBlocks = {
+    bpm: {
+      title: '📝 BPM (Business Process Management)',
+      html: '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
+        '<li><strong>BPM 개발:</strong> <a href="http://bpdev.kt.com:8103/bizflow/KTFBPM/ktf_login2.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpdev.kt.com:8103/bizflow/KTFBPM/ktf_login2.jsp</a></li>' +
+        '<li><strong>BPM 품질:</strong> <a href="http://bpdev.kt.com/bizflow/KTFBPM/ktf_login2.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpdev.kt.com/bizflow/KTFBPM/ktf_login2.jsp</a></li>' +
+        '<li><strong>KT CLOUD BPM 개발:</strong> <a href="http://bpmdev.ktcloud.com/bizflow/KTFBPM/ktf_login_ext.jsp?Febbpm!02" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpmdev.ktcloud.com/bizflow/KTFBPM/ktf_login_ext.jsp?Febbpm!02</a></li>' +
+        '<li><strong>KT CLOUD BPM 운영:</strong> <a href="http://bpm.ktcloud.com/bizflow/KTERPBPM/log/ds_log/ds_log.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpm.ktcloud.com/bizflow/KTERPBPM/log/ds_log/ds_log.jsp</a></li>' +
+        '</ul>'
+    },
+    eai: {
+      title: '🔗 EAI (Enterprise Application Integration)',
+      html: '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
+        '<li><strong>EAI 개발:</strong> <a href="http://10.217.52.41:8801/EAIAdmin/main/main.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://10.217.52.41:8801/EAIAdmin/main/main.jsp</a></li>' +
+        '<li><strong>EAI 품질:</strong> <a href="http://10.217.45.82:8811/EAIAdmin/main/main.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://10.217.45.82:8811/EAIAdmin/main/main.jsp</a></li>' +
+        '<li><strong>EAI 운영:</strong> <a href="http://10.220.18.11:9011/EAIAdmin/main/main.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://10.220.18.11:9011/EAIAdmin/main/main.jsp</a></li>' +
+        '</ul>'
+    },
+    easy_erp: {
+      title: '💼 Easy ERP',
+      html: '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
+        '<li><strong>Easy ERP 개발:</strong> <a href="http://keddev.kt.com/ERP/cm/view/CMV0010" target="_blank" style="color:#2574A9;text-decoration:none;">http://keddev.kt.com/ERP/cm/view/CMV0010</a></li>' +
+        '<li><strong>Easy ERP 품질:</strong> <a href="http://keqqas.kt.com/ERP/cm/view/CMV0010" target="_blank" style="color:#2574A9;text-decoration:none;">http://keqqas.kt.com/ERP/cm/view/CMV0010</a></li>' +
+        '<li><strong>Easy ERP 운영:</strong> <a href="http://easyerp.kt.com/ERP/cm/view/CMV0010" target="_blank" style="color:#2574A9;text-decoration:none;">http://easyerp.kt.com/ERP/cm/view/CMV0010</a></li>' + '비밀번호: init1234!' +
+        '</ul>'
+    },
+    itsm: {
+      title: '🛠️ ITSM (IT Service Management)',
+      html: '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
+        '<li><strong>사용자:</strong> <a href="https://itsm.ktds.co.kr/kt/index.do" target="_blank" style="color:#2574A9;text-decoration:none;">https://itsm.ktds.co.kr/kt/index.do</a></li>' +
+        '<li><strong>운영자:</strong> <a href="http://itsm.ktds.co.kr/oper/index.do" target="_blank" style="color:#2574A9;text-decoration:none;">http://itsm.ktds.co.kr/oper/index.do</a></li>' +
+        '</ul>'
+    },
+    srm: {
+      title: '🤝 SRM (Supplier Relationship Management)',
+      html: '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
+        '<li><strong>SRM 개발:</strong> <a href="https://srmdev.kt.com/kt_b0i8t6s2r1m_nigol.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">https://srmdev.kt.com/kt_b0i8t6s2r1m_nigol.jsp</a></li>' +
+        '<li><strong>SRM 품질:</strong> <a href="https://srmqa.kt.com/kt_b0i8t6s2r1m_nigol.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">https://srmqa.kt.com/kt_b0i8t6s2r1m_nigol.jsp</a></li>' +
+        '</ul>'
+    },
+    ep: {
+      title: '🖥️ EP',
+      html: '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
+        '<li><strong>EP 운영:</strong> <a href="http://biterp.kt.com/" target="_blank" style="color:#2574A9;text-decoration:none;">http://biterp.kt.com/</a></li>' +
+        '</ul>'
+    },
+    groupmail: {
+      title: '📬 그룹메일 아카이브 (Groupmail Archive)',
+      html: '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
+        '<li><strong>그룹메일 아카이브:</strong> <a href="https://groupmail.kt.co.kr:8443/" target="_blank" style="color:#2574A9;text-decoration:none;">https://groupmail.kt.co.kr:8443/</a></li>' +
+        '</ul>'
+    }
+  };
+
+  var systemNames = {
+    bpm: 'BPM',
+    eai: 'EAI',
+    easy_erp: 'Easy ERP',
+    itsm: 'ITSM',
+    srm: 'SRM',
+    ep: 'EP',
+    groupmail: '그룹메일 아카이브'
+  };
+
+  var result = '';
+
+  if (systemType === 'all') {
+    // 전체 시스템 안내
+    result = '<strong>🖥️ STP 연계 시스템 안내</strong><br/><br/>' +
+      '<div style="background:var(--info-bg-light, #E8F4FD);border-left:4px solid #2574A9;padding:12px 16px;border-radius:8px;margin-bottom:16px;">' +
+      '<strong>📌 주요 연계 시스템:</strong> BPM, EAI, EASY ERP, SRM, ITSM, EP, 그룹메일</div>';
+
+    var keys = ['eai', 'bpm', 'easy_erp', 'itsm', 'srm', 'ep', 'groupmail'];
+    for (var i = 0; i < keys.length; i++) {
+      var key = keys[i];
+      var block = systemBlocks[key];
+      result += '<h4 style="color:var(--kt-red);margin:16px 0 10px 0;font-size:15px;">' + block.title + '</h4>' +
+        '<div style="background:var(--bg-card, #F5EFE6);border:1px solid var(--border-color);border-radius:8px;padding:14px;margin-bottom:12px;">' +
+        block.html + '</div>';
+    }
+  } else {
+    // 개별 시스템만 안내
+    var block = systemBlocks[systemType];
+    var sysName = systemNames[systemType] || systemType;
+    if (block) {
+      result = '<strong>🖥️ ' + sysName + ' 접속 주소</strong><br/><br/>' +
+        '<div style="background:var(--bg-card, #F5EFE6);border:1px solid var(--border-color);border-radius:8px;padding:14px;">' +
+        block.html + '</div>';
+    }
+  }
+
+  result += '<br/><hr style="border:0;border-top:1px solid var(--border-color);margin:16px 0;">' +
     '<div style="font-size:12px;color:var(--text-muted);line-height:1.6;">' +
     '💡 참고: 각 시스템 접속 시 별도의 인증이 필요할 수 있습니다.<br/>' +
     '문의사항이 있으시면 해당 시스템 담당자에게 연락해 주세요.' +
     '</div>';
+
+  return result;
 }
 
 /* ============================================================
@@ -1085,13 +1328,13 @@ function buildNewCompanyAnswer() {
     '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:16px;text-align:center;">' +
     '<strong style="color:var(--kt-red);font-size:13px;">📚 관련 매뉴얼</strong><br/><br/>' +
     '<div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">' +
-    '<a href="images/Contract_Department_Manual.pptx" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--border-color);border-radius:8px;font-size:12px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">' +
+    '<a href="docs/manual/계약부서 매뉴얼.pptx" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--border-color);border-radius:8px;font-size:12px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">' +
     '<i class="fa-solid fa-file-powerpoint" style="color:#D24726;font-size:14px;"></i> 계약부서 매뉴얼' +
     '</a>' +
-    '<a href="images/Netcore_Manual.pptx" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--border-color);border-radius:8px;font-size:12px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">' +
+    '<a href="docs/manual/Netcore 매뉴얼.pptx" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--border-color);border-radius:8px;font-size:12px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">' +
     '<i class="fa-solid fa-file-powerpoint" style="color:#D24726;font-size:14px;"></i> Netcore 매뉴얼' +
     '</a>' +
-    '<a href="images/PnM_Manual.pptx" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--border-color);border-radius:8px;font-size:12px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">' +
+    '<a href="docs/manual/P&M 매뉴얼.pptx" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border:1px solid var(--border-color);border-radius:8px;font-size:12px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">' +
     '<i class="fa-solid fa-file-powerpoint" style="color:#D24726;font-size:14px;"></i> P&M 매뉴얼' +
     '</a>' +
     '</div>' +
@@ -1235,7 +1478,7 @@ async function fetchPOList(top = 10) {
 /* ============================================================
     STP MM 연동&배치 키워드 감지 및 즉시 응답
     ============================================================ */
-const MM_INTEGRATION_KEYWORDS = ['MM 연동','MM 연동&배치', 'STP MM RFC&배치' ];
+const MM_INTEGRATION_KEYWORDS = ['MM 연동', 'MM 연동&배치', 'STP MM RFC&배치', 'MM RFC & 배치'];
 
 function isDeployProcessQuery(text) {
   return MM_INTEGRATION_KEYWORDS.some(function(kw) { return text.includes(kw); });
@@ -1594,7 +1837,7 @@ document.querySelectorAll('.category-item').forEach(function(item) {
         break;
         
       case 'account':
-        if (bubble) bubble.innerHTML = buildSystemAnswer();
+        if (bubble) bubble.innerHTML = buildSystemAnswer('all');
         break;
         
       case 'deploy':
@@ -1689,19 +1932,19 @@ document.querySelectorAll('.tree-title').forEach(function(item) {
     ============================================================ */
 function buildMMIntegrationAnswer() {
   const mmIntegrationAnswer = `
-    <h4 style="font-size:15px;">🔗 MM 프로그램/연동/배치</h4>
-    <a href="https://gdrive.kt.co.kr/channel/968/edit?itemIdx=321110" target="_blank" rel="noopener noreferrer" style="color:#666666;font-size:13px;text-decoration:underline;">
+    <h4 style="font-size:15px;color:var(--text-primary);">🔗 MM 프로그램/연동/배치</h4>
+    <a href="https://gdrive.kt.co.kr/channel/968/edit?itemIdx=321110" target="_blank" rel="noopener noreferrer" style="color:var(--text-secondary);font-size:13px;text-decoration:underline;">
       <i class="fa-solid fa-external-link-alt" style="font-size:11px;"></i> MM(STP/SCP) 프로그램/연동/배치 리스트
     </a><br/><br/>
 
-    <h4 style="font-size:15px;">🔗 J-FLOW 소개</h4>
-    <div style="background:#FCE8EC;border-left:4px solid #E4A3AD;padding:16px 20px;border-radius:8px;margin-bottom:20px;color:#444444;">
+    <h4 style="font-size:15px;color:var(--text-primary);">🔗 J-FLOW 소개</h4>
+    <div style="background:var(--bg-card);border-left:4px solid var(--kt-red);padding:16px 20px;border-radius:8px;margin-bottom:20px;color:var(--text-secondary);">
       <strong>J-FLOW 는 KT DS 전사 Batch 작업 통합 시스템</strong><br/><br/>
       기업 내 배치작업에 대한 계획 및 수행정보를 파악하여 업무의 가용성을 보증하여 업무 효율성을 높이며<br/>
       <strong>장애 발생을 사전에 예방하는 시스템</strong>입니다.
     </div>
 
-    <h4 style="color:#C8546A;margin:20px 0 12px 0;font-size:15px;">🎯 주요 기능</h4>
+    <h4 style="color:var(--kt-red);margin:20px 0 12px 0;font-size:15px;">🎯 주요 기능</h4>
     <ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);">
       <li><strong>배치 작업 통합 관리</strong> - 전사 배치작업의 계획 및 수행 상태 모니터링</li>
       <li><strong>업무 가용성 보증</strong> - 작업 순서 및 의존성 관리로 정상 운영 보장</li>
@@ -1709,9 +1952,9 @@ function buildMMIntegrationAnswer() {
       <li><strong>장애 예방</strong> - 이상 징후 조기 감지 및 사전 대응</li>
     </ul>
 
-    <div style="background:#F0F7FF;border-left:4px solid #2574A9;border-radius:8px;padding:14px 16px;margin:20px 0;">
-      <strong style="color:#2574A9;font-size:14px;">📌 별첨: J-FLOW 작업 등록 시 주의사항</strong><br/><br/>
-      <div style="font-size:13px;line-height:1.8;color:#000;">
+    <div style="background:var(--bg-card);border-left:4px solid var(--kt-blue);border-radius:8px;padding:14px 16px;margin:20px 0;">
+      <strong style="color:var(--kt-blue);font-size:14px;">📌 별첨: J-FLOW 작업 등록 시 주의사항</strong><br/><br/>
+      <div style="font-size:13px;line-height:1.8;color:var(--text-secondary);">
         <strong>1. 작업 등록</strong><br/>
         J-FLOW 시스템에서 배치 작업을 등록할 때 <strong>변형 (Variant)</strong> 값을 등록할 수 있습니다.<br/><br/>
 
@@ -1719,34 +1962,34 @@ function buildMMIntegrationAnswer() {
         작업을 등록하면 <strong>KT 경영플랫폼 팀</strong>에서 결재 절차를 진행합니다.<br/><br/>
 
         <strong>3. 변형 값 등록 시 오류 발생 (⚠️ 중요)</strong><br/>
-        <div style="background:#FFF3CD;border-left:3px solid #FFC107;padding:10px 12px;border-radius:4px;margin:8px 0;">
+        <div style="background:var(--warning-bg,var(--bg-hover));border-left:3px solid var(--warning-color,#FFC107);padding:10px 12px;border-radius:4px;margin:8px 0;">
           <strong>원인:</strong> 변형 값을 <strong>한글</strong>로 등록하면 Control-M 시스템이 인식하지 못합니다.<br/>
           <strong>해결:</strong> 변형 값은 <strong>무조건 영문</strong>으로 등록해야 합니다.<br/><br/>
           <strong>예시:</strong><br/>
-          <span style="color:#d9534f;">❌ 잘못된 예:</span> 변형 = "입고처리"<br/>
+          <span style="color:var(--kt-red);">❌ 잘못된 예:</span> 변형 = "입고처리"<br/>
           <span style="color:#5cb85c;">✅ 올바른 예:</span> 변형 = "INBOUND_PROCESS"
         </div>
       </div>
     </div><br/>
 
     <div style="text-align:left;margin-bottom:16px;">
-      <strong style="color:#666666;font-size:13px;"><i class="fa-solid fa-link"></i> 관련 문서</strong><br/>
-      <a href="https://ktds-kms.atlassian.net/wiki/spaces/ERPX/pages/168165467/MM_" target="_blank" rel="noopener noreferrer" style="color:#666666;font-size:13px;text-decoration:underline;">
+      <strong style="color:var(--text-secondary);font-size:13px;"><i class="fa-solid fa-link"></i> 관련 문서</strong><br/>
+      <a href="https://ktds-kms.atlassian.net/wiki/spaces/ERPX/pages/168165467/MM_" target="_blank" rel="noopener noreferrer" style="color:var(--text-secondary);font-size:13px;text-decoration:underline;">
         <i class="fa-solid fa-external-link-alt" style="font-size:11px;"></i> ERPX 위키 - J-FLOW 배치 정보 참조
       </a>
     </div>
 
     <hr style="border:0;border-top:1px solid var(--border-color);margin:16px 0;">
-    <div style="background:var(--dark-card);border:1px solid var(--dark-border);border-radius:8px;padding:16px;text-align:center;">
-      <strong>📚 추가 자료</strong><br/><br/>
+    <div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:16px;text-align:center;">
+      <strong style="color:var(--text-primary);">📚 추가 자료</strong><br/><br/>
       <div style="display:flex;flex-wrap:wrap;gap:16px;justify-content:center;">
-        <a href="images/jflow-manual.doc" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--dark-border);border-radius:8px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">
-          <i class="fa-solid fa-file-word" style="color:#2574A9;font-size:16px;"></i> J-FLOW 사용자 메뉴얼
+        <a href="docs/manual/J-FLOW 사용자 매뉴얼.doc" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">
+          <i class="fa-solid fa-file-word" style="color:var(--kt-blue,var(--space-primary));font-size:16px;"></i> J-FLOW 사용자 메뉴얼
         </a>
-        <a href="images/jflow-integration-slides.ppt" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--dark-border);border-radius:8px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">
-          <i class="fa-solid fa-file-powerpoint" style="color:#D24726;font-size:16px;"></i> JFLOW 배치잡 연동 방법 정리 (FM)
+        <a href="docs/manual/J-FLOW 배치잡 연동 방법 정리(FM).ppt" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">
+          <i class="fa-solid fa-file-powerpoint" style="color:var(--kt-red);font-size:16px;"></i> JFLOW 배치잡 연동 방법 정리 (FM)
         </a>
-        <a href="images/배치잡 list.xlsx" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--dark-border);border-radius:8px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">
+        <a href="docs/manual/배치잡 리스트 .xlsx" download style="display:inline-flex;align-items:center;gap:8px;padding:8px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:13px;color:var(--text-secondary);text-decoration:none;transition:var(--transition);">
           <i class="fa-solid fa-file-excel" style="color:#217346;font-size:16px;"></i> 배치잡 리스트
         </a>
       </div><br/>
@@ -2092,68 +2335,7 @@ async function extractTextFromHTML(file) {
 }
 
 /**
- * 이미지 파일에서 OCR 로 텍스트 추출
- * @param {File} file - 이미지 파일
- * @returns {Promise<string>} 추출된 텍스트
- */
-async function extractTextFromImage(file) {
-  if (typeof Tesseract === 'undefined') {
-    console.error('[OCR] Tesseract.js 가 로드되지 않았습니다!');
-    return '[오류: 이미지 텍스트 인식 기능을 사용할 수 없습니다. Tesseract.js 라이브러리가 로드되지 않았습니다.]';
-  }
-
-  try {
-    console.log('[OCR] 이미지 텍스트 추출 시작:', file.name, '크기:', Math.round(file.size/1024), 'KB');
-    
-    // OCR 진행 상황 표시
-    if (typeof showToast === 'function') {
-      showToast('이미지 텍스트 인식 중... (시간을 좀 주십시오)', 'info');
-    }
-    
-    const worker = await Tesseract.createWorker('kor+eng', 1, {
-      logger: m => {
-        console.log('[OCR 진행률]', m.status, Math.round(m.progress * 100) + '%');
-        if (typeof updateTypingText === 'function' && m.status) {
-          updateTypingText('이미지 인식 중... ' + Math.round(m.progress * 100) + '%');
-        }
-      }
-    });
-    
-    const ret = await worker.recognize(file);
-    await worker.terminate();
-    
-    const extractedText = ret.data.text;
-    
-    console.log('[OCR] 추출 완료:', extractedText.length, '자');
-    
-    if (!extractedText || extractedText.trim().length === 0) {
-      return '[이미지: ' + file.name + ']\n' +
-             '[인식된 텍스트가 없습니다.]\n\n' +
-             '이미지에 텍스트가 없거나, 텍스트가 너무 작거나 흐릿하여 인식할 수 없습니다.\n' +
-             '명확한 텍스트가 포함된 이미지를 사용해보세요.';
-    }
-    
-    return '[이미지 파일: ' + file.name + ']\n' +
-           '[인식된 텍스트 (OCR):]\n' +
-           '━━━━━━━━━━━━━━━━━━━━━━━━\n' +
-           extractedText +
-           '\n━━━━━━━━━━━━━━━━━━━━━━━━\n\n' +
-           '위 텍스트는 이미지에서 자동 인식된 내용입니다.';
-           
-  } catch (error) {
-    console.error('[OCR] 오류 발생:', error);
-    return '[이미지: ' + file.name + ']\n' +
-           '[OCR 처리 중 오류 발생]\n' +
-           '오류 상세: ' + error.message + '\n\n' +
-           '다음 사항을 확인해보세요:\n' +
-           '1. 이미지가 손상되지 않았는지 확인\n' +
-           '2. 이미지 크기가 너무 크지 않은지 확인\n' +
-           '3. 브라우저 콘솔에서 추가 오류 메시지 확인';
-  }
-}
-
-/**
- * 첨부 파일의 텍스트를 모두 추출하여 반환
+ * 첨부 파일의 텍스트를 모두 추출하여 반환 (문서 파일만 처리, 이미지는 DIFY API 로 직접 업로드)
  * @param {Array} attachments - 첨부 파일 목록
  * @returns {Promise<string>} 추출된 텍스트들 (파일별 구분)
  */
@@ -2163,39 +2345,31 @@ async function extractAllAttachmentsText(attachments) {
   const extractionPromises = attachments.map(async (attachment) => {
     const fileName = attachment.name;
     const fileType = attachment.type || getFileType(attachment.file);
-    
+
     // 캐시 확인
     if (state.extractedTextCache[fileName]) {
-      console.log('[Document Extraction] 캐시에서 텍스트 로드:', fileName);
+      console.log('[Attachment Extraction] 캐시에서 텍스트 로드:', fileName);
       return { fileName, text: state.extractedTextCache[fileName] };
     }
 
-    let extractedText;
-    
-    // 이미지 파일 - OCR 로 텍스트 추출
-    if (fileType === 'image') {
-      console.log('[OCR] 이미지 텍스트 추출 시작:', fileName);
-      extractedText = await extractTextFromImage(attachment.file);
-    } else {
-      // 문서 파일 - 기존 텍스트 추출
-      console.log('[Document Extraction] 텍스트 추출 시작:', fileName);
-      extractedText = await extractTextFromDocument(attachment.file);
-    }
-    
+    // 문서 파일 - 텍스트 추출 (이미지는 DIFY API 로 직접 업로드됨)
+    console.log('[Document Extraction] 텍스트 추출 시작:', fileName);
+    const extractedText = await extractTextFromDocument(attachment.file);
+
     // 캐시에 저장
     state.extractedTextCache[fileName] = extractedText;
-    
+
     return { fileName, text: extractedText };
   });
 
   const results = await Promise.all(extractionPromises);
-  
+
   // 결과 필터링 및 포맷팅
-  const validResults = results.filter(r => r !== null && r.text);
-  
+  const validResults = results.filter(function(r) { return r !== null && r.text; });
+
   if (validResults.length === 0) return '';
 
-  let combinedText = '\n\n=== 첨부 문서 내용 ===\n\n';
+  let combinedText = '\n\n=== 첨부 파일 내용 ===\n\n';
   validResults.forEach((result, index) => {
     combinedText += '--- [파일 ' + (index + 1) + ': ' + result.fileName + '] ---\n';
     combinedText += result.text;
@@ -2318,7 +2492,7 @@ function bindQuickButtons() {
       if (msg && msg.includes('연계 시스템')) {
         const bubble = createAgentBubble('account');
         if (bubble) {
-          bubble.innerHTML = buildSystemAnswer();
+          bubble.innerHTML = buildSystemAnswer('all');
           scrollBottom();
           
           // 통계 업데이트
@@ -2416,6 +2590,16 @@ updateStats();
       console.log('[DEBUG] Showing Netcore/P&M Contact');
       if (bubble) {
         bubble.innerHTML = buildNetcorePmContactAnswer();
+      }
+      // 카테고리 초기화
+      if ($chatMessages) {
+        delete $chatMessages.dataset.currentCategory;
+      }
+    } else if (currentCategory === 'cloud') {
+      // KT CLOUD 담당자 연락처
+      console.log('[DEBUG] Showing KT CLOUD Contact');
+      if (bubble) {
+        bubble.innerHTML = buildKtCloudContactAnswer();
       }
       // 카테고리 초기화
       if ($chatMessages) {
@@ -2534,7 +2718,7 @@ updateStats();
             '</tr>' +
             '<tr style="background:var(--bg-card);"><td colspan="2" style="padding:4px;border:none;height:8px;"></td></tr>' +
             '<tr style="background:var(--bg-secondary);">' +
-              '<td style="padding:8px;border:1px solid var(--border-color);"><strong>Easy ERP</strong></td>' +
+              '<td style="padding:8px;border:1px solid var(--border-color);"><strong>Easy ERP 개발</strong></td>' +
               '<td style="padding:8px;border:1px solid var(--border-color);"><a href="http://keddev.kt.com/ERP/cm/view/CMV0010" target="_blank" style="color:#2574A9;text-decoration:none;">http://keddev.kt.com/ERP/cm/view/CMV0010</a></td>' +
             '</tr>' +
             '<tr style="background:var(--bg-card);"><td colspan="2" style="padding:4px;border:none;height:8px;"></td></tr>' +
@@ -2589,6 +2773,9 @@ updateStats();
       } else if (lowerText.includes('netcore') || lowerText.includes('p&m') || lowerText.includes('넷코어')) {
         currentCategory = 'netcore-pm';
         console.log('[DEBUG] Detected Netcore/P&M from query text');
+      } else if (lowerText.includes('kt cloud') || lowerText.includes('ktcloud') || lowerText.includes('kt 클라우드') || lowerText.includes('클라우드')) {
+        currentCategory = 'cloud';
+        console.log('[DEBUG] Detected KT CLOUD from query text');
       }
     }
     
@@ -2606,6 +2793,14 @@ updateStats();
       // kt netcore | kt p&m 담당자 연락처
       console.log('[DEBUG] Showing Netcore/P&M Contact');
       if (bubble) bubble.innerHTML = buildNetcorePmContactAnswer();
+      // 카테고리 초기화
+      if ($chatMessages) {
+        delete $chatMessages.dataset.currentCategory;
+      }
+    } else if (currentCategory === 'cloud') {
+      // KT CLOUD 담당자 연락처
+      console.log('[DEBUG] Showing KT CLOUD Contact');
+      if (bubble) bubble.innerHTML = buildKtCloudContactAnswer();
       // 카테고리 초기화
       if ($chatMessages) {
         delete $chatMessages.dataset.currentCategory;
@@ -2629,8 +2824,9 @@ updateStats();
   // 연계 시스템 질문 감지
   if (isSystemQuery(text)) {
     const startTime = Date.now();
+    const systemType = detectSystemType(text);
     const bubble = createAgentBubble('account');
-    if (bubble) bubble.innerHTML = buildSystemAnswer();
+    if (bubble) bubble.innerHTML = buildSystemAnswer(systemType);
     scrollBottom();
     const elapsed = Date.now() - startTime;
     state.stats.pending   = Math.max(0, state.stats.pending - 1);
@@ -2690,6 +2886,13 @@ updateStats();
     } else if (currentCategory === 'netcore-pm') {
       // kt netcore | kt p&m 담당자 연락처
       if (bubble) bubble.innerHTML = buildNetcorePmContactAnswer();
+      // 카테고리 초기화
+      if ($chatMessages) {
+        delete $chatMessages.dataset.currentCategory;
+      }
+    } else if (currentCategory === 'cloud') {
+      // KT CLOUD 담당자 연락처
+      if (bubble) bubble.innerHTML = buildKtCloudContactAnswer();
       // 카테고리 초기화
       if ($chatMessages) {
         delete $chatMessages.dataset.currentCategory;
@@ -2884,70 +3087,55 @@ async function callAIAgent(userText, category) {
   let answerText   = '';
 
   try {
-    // 모든 첨부 파일 (문서 + 이미지) 에서 텍스트 추출
+    // 첨부 파일 처리: 이미지는 DIFY 업로드, 문서는 텍스트 추출
     let extractedText = '';
+    const uploadedFiles = [];
     if (state.pendingAttachments && state.pendingAttachments.length > 0) {
-      const totalAttachments = state.pendingAttachments.length;
       const imageAttachments = state.pendingAttachments.filter(function(a) {
         return a.type === 'image';
       });
-      const documentAttachments = state.pendingAttachments.filter(function(a) {
+      const docAttachments = state.pendingAttachments.filter(function(a) {
         return a.type !== 'image';
       });
-      
-      // 텍스트 추출 시작
-      console.log('[Document Extraction] 텍스트 추출 시작:', totalAttachments, '개 파일 (문서:', documentAttachments.length, ', 이미지:', imageAttachments.length, ')');
-      
-      if (imageAttachments.length > 0) {
-        updateTypingText('이미지 텍스트 인식 중... (' + imageAttachments.length + '개 이미지) - 시간이 소요될 수 있습니다');
-        showToast('이미지 내 텍스트를 인식 중입니다... (최대 30 초까지 걸릴 수 있음)', 'info');
-      } else {
-        updateTypingText('파일 내용 추출 중... (' + totalAttachments + '개 파일)');
-        showToast('파일 내용을 분석 중입니다...', 'info');
-      }
-      
-      try {
-        extractedText = await extractAllAttachmentsText(state.pendingAttachments);
-        if (extractedText) {
-          console.log('[Document Extraction] 추출 완료, 텍스트 길이:', extractedText.length);
-          updateTypingText('파일 분석 완료, 응답 생성 중...');
-        }
-      } catch (extractError) {
-        console.error('[Document Extraction] 추출 오류:', extractError);
-        showToast('파일 분석 중 오류가 발생했습니다: ' + extractError.message, 'error');
-        updateTypingText('분석 중...');
-      }
-    }
 
-    // 첨부 파일이 있으면 Dify 에 업로드 (이미지만)
-    let files = null;
-    if (state.pendingAttachments && state.pendingAttachments.length > 0) {
-      const imageAttachments = state.pendingAttachments.filter(function(a) {
-        return a.type === 'image';
-      });
-      
+      // 이미지 파일은 DIFY 에 직접 업로드 (AI 비전 모델이 직접 읽음 - Tesseract OCR 불필요)
       if (imageAttachments.length > 0) {
-        const uploadPromises = imageAttachments.map(async (attachment) => {
+        updateTypingText('이미지 업로드 중... (' + imageAttachments.length + '개 이미지)');
+        showToast('이미지를 분석 중입니다...', 'info');
+
+        for (const att of imageAttachments) {
           try {
-            const upload_file_id = await uploadFileToDify(attachment.file);
-            return {
+            const fileId = await uploadFileToDify(att.file);
+            uploadedFiles.push({
               type: 'image',
               transfer_method: 'local_file',
-              upload_file_id: upload_file_id
-            };
-          } catch (err) {
-            console.error('[File Upload] 실패:', attachment.name, err);
-            showToast('파일 업로드 실패: ' + attachment.name, 'error');
-            return null;
+              upload_file_id: fileId
+            });
+            console.log('[Image Upload] 업로드 완료:', att.name, 'fileId:', fileId);
+          } catch (uploadErr) {
+            console.error('[Image Upload] 업로드 실패:', att.name, uploadErr);
           }
-        });
-
-        const uploadedFiles = await Promise.all(uploadPromises);
-        files = uploadedFiles.filter(function(f) { return f !== null; });
-        
-        if (files.length === 0 && imageAttachments.length > 0) {
-          throw new Error('모든 이미지 업로드에 실패했습니다.');
         }
+      }
+
+      // 문서 파일은 텍스트만 추출하여 쿼리에 추가
+      if (docAttachments.length > 0) {
+        console.log('[Document Extraction] 텍스트 추출 시작:', docAttachments.length, '개 파일');
+        updateTypingText('문서 내용 추출 중... (' + docAttachments.length + '개 파일)');
+
+        try {
+          extractedText = await extractAllAttachmentsText(docAttachments);
+          if (extractedText) {
+            console.log('[Document Extraction] 추출 완료, 텍스트 길이:', extractedText.length);
+          }
+        } catch (extractError) {
+          console.error('[Document Extraction] 추출 오류:', extractError);
+          showToast('문서 분석 중 오류가 발생했습니다: ' + extractError.message, 'error');
+        }
+      }
+
+      if (uploadedFiles.length > 0 || extractedText) {
+        updateTypingText('파일 분석 완료, 응답 생성 중...');
       }
     }
 
@@ -2965,7 +3153,7 @@ async function callAIAgent(userText, category) {
       conversation_id : state.difyConversationId || '',
       user            : DIFY_API.userId,
       auto_generate_name: false,
-      files           : files || []
+      files           : uploadedFiles
     };
 
     const res = await fetch(DIFY_API.endpoint, {
