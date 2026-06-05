@@ -217,6 +217,8 @@ document.addEventListener("DOMContentLoaded", () => {
             chatMessages.dataset.currentCategory = "netcore-pm";
           } else if (companyName === "cloud") {
             chatMessages.dataset.currentCategory = "cloud";
+          } else if (companyName === "skylife") {
+            chatMessages.dataset.currentCategory = "skylife";
           }
           
           // netcore-pm 의 경우 신설법인 프로세스 버튼으로 변경
@@ -243,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
                   '<button class="quick-btn" data-msg="' + companyLabel + ' 업무 프로세스 알려주세요"><i class="fa-solid fa-building-circle-arrow-right"></i> 업무 프로세스</button>' +
                   '<button class="quick-btn" data-msg="' + companyLabel + ' Table & T-code 알려주세요"><i class="fa-solid fa-table"></i> Table & T-code</button>' +
                   '<button class="quick-btn" data-msg="' + companyLabel + ' RFC & 배치 알려주세요"><i class="fa-solid fa-network-wired"></i> RFC & 배치</button>' +
-                  '<button class="quick-btn" data-msg="' + companyLabel + ' 담당자 연락처 알려주세요" data-category="' + (companyName === "alpha" ? "alpha" : "") + '"><i class="fa-solid fa-address-book"></i> 담당자 연락처</button>' +
+                  '<button class="quick-btn" data-msg="' + companyLabel + ' 담당자 연락처 알려주세요" data-category="' + (companyName === "alpha" ? "alpha" : companyName === "skylife" ? "skylife" : companyName === "cloud" ? "cloud" : companyName === "netcore-pm" ? "netcore-pm" : "") + '"><i class="fa-solid fa-address-book"></i> 담당자 연락처</button>' +
                 '</div>' +
               '</div>';
           }
@@ -555,7 +557,7 @@ function isContactQuery(text) {
   }
   
   // 담당자/연락처 키워드가 포함되면 무조건 담당자 연락처로 처리 (우선순위 최상)
-  const contactKeywords = ['STP 담당자','STP 담당부서','STP 운영 담당','STP 운영담당' ];
+  const contactKeywords = ['STP 담당자','STP 담당부서','STP 운영 담당','STP 운영담당','담당자 연락처','연락처 알려주세요','담당자 알려주세요'];
   if (contactKeywords.some(function(kw) { return text.includes(kw); })) {
     return true;
   }
@@ -873,6 +875,145 @@ function buildKtCloudContactAnswer() {
     '</table>';
 
   return ktCloudContact;
+}
+
+function buildSkylifeContactAnswer() {
+  const skylifeContact =
+    '<strong>📋 KT SKYLIFE 시스템 담당자</strong><br/>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:13px;">' +
+      '<thead>' +
+        '<tr style="background:var(--kt-red);color:#fff;">' +
+          '<th style="padding:8px 12px;text-align:left;border-radius:4px 0 0 0;">KT SKYLIFE 업무</th>' +
+          '<th style="padding:8px 12px;text-align:left;">사업부서 담당자</th>' +
+          '<th style="padding:8px 12px;text-align:left;">사업부서</th>' +
+          '<th style="padding:8px 12px;text-align:left;">시스템 담당자</th>' +
+          '<th style="padding:8px 12px;text-align:left;border-radius:0 4px 0 0;">시스템 담당팀</th>' +
+        '</tr>' +
+      '</thead>' +
+      '<tbody>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>ERP PM</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">인하영 책임</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">물류DX개발팀</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>ERP HR ITO</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">인하영 책임, 김참이 선임</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">물류DX개발팀</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>ERP FI ITO</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">김혜지 선임</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">재무DX개발팀</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>ERP CO ITO</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">송치현 과장</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">재무DX개발팀(협력사)</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>ERP EP ITO</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">김이준 선임</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">물류DX개발팀</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>ERP BC ITO</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">장웅재 책임</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">재무DX개발팀</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>skylife ERP 운영 전반</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">전형순 팀장, 선윤오 사원</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">skylife IT기획팀</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>자재코드 생성 및 IMG 세팅</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">선윤오 사원</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">skylife IT기획팀</td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>기초입고</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">박승현 대리 → 안지홍 사원</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">기술전략팀</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>구매입고</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">박승현 대리 → 안지홍 사원</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">기술전략팀</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>단가조정</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">박승현 대리 → 안지홍 사원</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">기술전략팀</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>출고</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">박승현 대리 → 안지홍 사원</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">기술전략팀</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>물류 월 마감</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">박승현 대리 → 안지홍 사원</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);">기술전략팀</td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>OTS 출고</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>SCIS 수불연동</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-bg);">' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"><strong>영업전산 시스템</strong></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+          '<td style="padding:8px 12px;border-bottom:1px solid var(--border-color);"></td>' +
+        '</tr>' +
+        '<tr style="background:var(--dark-card);">' +
+          '<td style="padding:8px 12px;"><strong>구매계약 시스템</strong></td>' +
+          '<td style="padding:8px 12px;"></td>' +
+          '<td style="padding:8px 12px;"></td>' +
+          '<td style="padding:8px 12px;"></td>' +
+          '<td style="padding:8px 12px;"></td>' +
+        '</tr>' +
+      '</tbody>' +
+    '</table>';
+
+  return skylifeContact;
 }
 
 /* ============================================================
@@ -2525,12 +2666,11 @@ function bindQuickButtons() {
       $userInput.focus();
       
       // 담당자 연락처 버튼일 경우 data-category 속성 전달
-      if (btnCategory) {
-        // 임시로 chatMessages 에 카테고리 저장
-        if ($chatMessages) {
-          $chatMessages.dataset.currentCategory = btnCategory;
-        }
+      if (btnCategory && $chatMessages) {
+        // data-category 가 있으면 chatMessages 에 카테고리 저장 (기존 값 덮어쓰기)
+        $chatMessages.dataset.currentCategory = btnCategory;
       }
+      // data-category 가 없으면 chatMessages 에 이미 저장된 currentCategory 를 그대로 유지
       
       handleSend();
     });
@@ -2600,6 +2740,16 @@ updateStats();
       console.log('[DEBUG] Showing KT CLOUD Contact');
       if (bubble) {
         bubble.innerHTML = buildKtCloudContactAnswer();
+      }
+      // 카테고리 초기화
+      if ($chatMessages) {
+        delete $chatMessages.dataset.currentCategory;
+      }
+    } else if (currentCategory === 'skylife') {
+      // KT SKYLIFE 담당자 연락처
+      console.log('[DEBUG] Showing KT SKYLIFE Contact');
+      if (bubble) {
+        bubble.innerHTML = buildSkylifeContactAnswer();
       }
       // 카테고리 초기화
       if ($chatMessages) {
@@ -2776,6 +2926,9 @@ updateStats();
       } else if (lowerText.includes('kt cloud') || lowerText.includes('ktcloud') || lowerText.includes('kt 클라우드') || lowerText.includes('클라우드')) {
         currentCategory = 'cloud';
         console.log('[DEBUG] Detected KT CLOUD from query text');
+      } else if (lowerText.includes('skylife') || lowerText.includes('스카이라이프')) {
+        currentCategory = 'skylife';
+        console.log('[DEBUG] Detected KT SKYLIFE from query text');
       }
     }
     
@@ -2801,6 +2954,14 @@ updateStats();
       // KT CLOUD 담당자 연락처
       console.log('[DEBUG] Showing KT CLOUD Contact');
       if (bubble) bubble.innerHTML = buildKtCloudContactAnswer();
+      // 카테고리 초기화
+      if ($chatMessages) {
+        delete $chatMessages.dataset.currentCategory;
+      }
+    } else if (currentCategory === 'skylife') {
+      // KT SKYLIFE 담당자 연락처
+      console.log('[DEBUG] Showing KT SKYLIFE Contact');
+      if (bubble) bubble.innerHTML = buildSkylifeContactAnswer();
       // 카테고리 초기화
       if ($chatMessages) {
         delete $chatMessages.dataset.currentCategory;
@@ -2893,6 +3054,13 @@ updateStats();
     } else if (currentCategory === 'cloud') {
       // KT CLOUD 담당자 연락처
       if (bubble) bubble.innerHTML = buildKtCloudContactAnswer();
+      // 카테고리 초기화
+      if ($chatMessages) {
+        delete $chatMessages.dataset.currentCategory;
+      }
+    } else if (currentCategory === 'skylife') {
+      // KT SKYLIFE 담당자 연락처
+      if (bubble) bubble.innerHTML = buildSkylifeContactAnswer();
       // 카테고리 초기화
       if ($chatMessages) {
         delete $chatMessages.dataset.currentCategory;
@@ -3584,6 +3752,9 @@ function markdownToHtml(text) {
   
   // 볼드 텍스트 처리
   processed = processed.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  
+  // 볼드 처리 후 남은 단독 * 제거 (전화번호 등 숫자 마스킹 방지)
+  processed = processed.replace(/\*/g, '');
   
   // 인라인 코드 처리
   processed = processed.replace(/`([^`\n]+)`/g,
