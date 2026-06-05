@@ -2153,25 +2153,35 @@ if ($userInput) {
 
   $userInput.addEventListener('paste', function(e) {
     console.log('[DEBUG] Paste event detected');
-    const items = e.clipboardData && e.clipboardData.items ? Array.from(e.clipboardData.items) : [];
+    const clipboardData = e.clipboardData || window.clipboardData;
+    const items = clipboardData && clipboardData.items ? Array.from(clipboardData.items) : [];
     console.log('[DEBUG] Clipboard items:', items.length);
-    const imageItems = items.filter(function(item) { return item.kind === 'file' && item.type.startsWith('image/'); });
+
+    // 이미지 항목 감지 (kind==='file' 이고 type이 image/ 로 시작)
+    const imageItems = items.filter(function(item) {
+      return item.kind === 'file' && item.type.startsWith('image/');
+    });
     console.log('[DEBUG] Image items found:', imageItems.length);
+
     if (imageItems.length > 0) {
       e.preventDefault();
       imageItems.forEach(function(item, index) {
         const file = item.getAsFile();
         if (!file) return;
-        const name = file.name || 'pasted-image-' + Date.now() + '-' + (index + 1) + '.png';
-        const isImage = file.type && file.type.startsWith('image/');
-        const attachment = { file: file, name: name, type: isImage ? 'image' : 'file' };
-        if (isImage) attachment.preview = URL.createObjectURL(file);
+        const name = file.name && file.name !== 'image.png' && file.name !== 'blob'
+          ? file.name
+          : 'pasted-image-' + Date.now() + '-' + (index + 1) + '.png';
+        const attachment = { file: file, name: name, type: 'image' };
+        attachment.preview = URL.createObjectURL(file);
         state.pendingAttachments.push(attachment);
-        console.log('[DEBUG] Added attachment:', name, 'Type:', attachment.type, 'Preview:', !!attachment.preview);
+        console.log('[DEBUG] Added attachment:', name, 'Type: image', 'Preview:', !!attachment.preview);
       });
       console.log('[DEBUG] Total attachments:', state.pendingAttachments.length);
       renderAttachments();
       console.log('[DEBUG] renderAttachments() called');
+
+      // 이미지 첨부 완료 안내
+      showToast('이미지가 첨부되었습니다. 질문을 입력하거나 바로 전송하세요.', 'info');
     } else {
       console.log('[DEBUG] No image items found in clipboard');
     }
@@ -2250,6 +2260,7 @@ if ($historySearch) {
 /* ============================================================
     DIFY FILE UPLOAD FUNCTIONS
     ============================================================ */
+
 /**
  * 파일을 Dify 에 업로드하고 upload_file_id 반환
  * @param {File} file - 업로드할 파일
@@ -2261,6 +2272,7 @@ async function uploadFileToDify(file) {
   formData.append('user', DIFY_API.userId);
 
   try {
+    console.log('[Image Upload] 시작:', file.name, 'size:', file.size, 'type:', file.type);
     const response = await fetch('https://api.abclab.ktds.com/v1/files/upload', {
       method: 'POST',
       headers: {
@@ -2271,15 +2283,73 @@ async function uploadFileToDify(file) {
 
     if (!response.ok) {
       const errText = await response.text();
+      console.error('[Image Upload] HTTP 에러:', response.status, errText);
       throw new Error('파일 업로드 실패: ' + response.status + ' - ' + errText);
     }
 
     const data = await response.json();
+    console.log('[Image Upload] 응답:', JSON.stringify(data));
+    console.log('[Image Upload] fileId:', data.id, 'name:', data.name, 'size:', data.size, 'mime:', data.mime_type);
     return data.id;
   } catch (err) {
     console.error('[Dify File Upload] 오류:', err);
     throw err;
   }
+}
+
+/**
+ * 이미지를 base64 data URL 로 변환
+ * @param {File} file 
+ * @returns {Promise<string>} data:image/...;base64,...
+ */
+function imageToBase64(file) {
+  return new Promise(function(resolve, reject) {
+    const reader = new FileReader();
+    reader.onload = function() { resolve(reader.result); };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+/**
+ * Tesseract.js 로 이미지에서 텍스트 추출 (클라이언트 측 OCR)
+ * @param {File} file 
+ * @returns {Promise<string>} 추출된 텍스트
+ */
+async function extractTextFromImage(file) {
+  return new Promise(function(resolve, reject) {
+    // Tesseract.js 동적 로드
+    if (typeof Tesseract === 'undefined') {
+      const script = document.createElement('script');
+      script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+      script.onload = function() {
+        processOCR(file).then(resolve).catch(reject);
+      };
+      script.onerror = function() {
+        reject(new Error('Tesseract.js 로딩 실패'));
+      };
+      document.head.appendChild(script);
+    } else {
+      processOCR(file).then(resolve).catch(reject);
+    }
+  });
+}
+
+async function processOCR(file) {
+  const imgEl = document.createElement('img');
+  imgEl.src = URL.createObjectURL(file);
+  await new Promise(function(r) { imgEl.onload = r; });
+
+  const { data: { text } } = await Tesseract.recognize(imgEl, 'kor+eng', {
+    logger: function(m) {
+      if (m.status === 'recognizing text') {
+        console.log('[OCR] 진행률:', Math.round(m.progress * 100) + '%');
+      }
+    }
+  });
+  URL.revokeObjectURL(imgEl.src);
+  console.log('[OCR] 추출 완료, 텍스트 길이:', text.length);
+  return text.trim();
 }
 
 /**
@@ -2705,6 +2775,13 @@ function handleSend() {
   state.stats.total++;
   state.stats.pending++;
 updateStats();
+
+  // 이미지 첨부가 있으면 고정 답변 로직 모두 건너뛰고 AI에게 직접 전송
+  const hasImageAttachment = state.pendingAttachments && state.pendingAttachments.some(function(a) { return a.type === 'image'; });
+  if (hasImageAttachment) {
+    callAIAgent(text || '첨부된 이미지를 분석해주세요.', category);
+    return;
+  }
 
   // 빈 질문일 경우 카테고리별 고정 답변 제공
   if (!text || text.trim() === '') {
@@ -3266,12 +3343,17 @@ async function callAIAgent(userText, category) {
         return a.type !== 'image';
       });
 
-      // 이미지 파일은 DIFY 에 직접 업로드 (AI 비전 모델이 직접 읽음 - Tesseract OCR 불필요)
+      // 이미지 파일: DIFY 업로드 + OCR 텍스트 추출 병렬 실행
+      // (Vision 모델이 이미지를 못 볼 경우를 대비해 OCR 텍스트도 쿼리에 포함)
       if (imageAttachments.length > 0) {
-        updateTypingText('이미지 업로드 중... (' + imageAttachments.length + '개 이미지)');
+        updateTypingText('이미지 업로드 및 OCR 분석 중... (' + imageAttachments.length + '개 이미지)');
         showToast('이미지를 분석 중입니다...', 'info');
 
-        for (const att of imageAttachments) {
+        // 모든 이미지에 대해 업로드 + OCR 을 병렬로 실행
+        const imagePromises = imageAttachments.map(async function(att) {
+          var result = { name: att.name, uploadOk: false, ocrText: '' };
+
+          // 1) DIFY 에 이미지 업로드 (비전 모델용)
           try {
             const fileId = await uploadFileToDify(att.file);
             uploadedFiles.push({
@@ -3279,10 +3361,43 @@ async function callAIAgent(userText, category) {
               transfer_method: 'local_file',
               upload_file_id: fileId
             });
+            result.uploadOk = true;
             console.log('[Image Upload] 업로드 완료:', att.name, 'fileId:', fileId);
           } catch (uploadErr) {
             console.error('[Image Upload] 업로드 실패:', att.name, uploadErr);
           }
+
+          // 2) OCR 텍스트 추출 (비전 모델 폴백용) — 업로드와 병렬
+          try {
+            const ocrText = await extractTextFromImage(att.file);
+            if (ocrText && ocrText.length > 10) {
+              result.ocrText = ocrText;
+              console.log('[OCR] 성공:', att.name, '텍스트 길이:', ocrText.length);
+            } else {
+              console.log('[OCR] 텍스트가 너무 짧음:', att.name);
+            }
+          } catch (ocrErr) {
+            console.warn('[OCR] 실패:', att.name, ocrErr.message);
+          }
+
+          return result;
+        });
+
+        const imageResults = await Promise.all(imagePromises);
+
+        // OCR 텍스트가 있으면 쿼리에 포함
+        var ocrTexts = [];
+        imageResults.forEach(function(r) {
+          if (r.ocrText) {
+            ocrTexts.push('\n--- 이미지 OCR: ' + r.name + ' ---\n' + r.ocrText);
+          }
+        });
+
+        if (ocrTexts.length > 0) {
+          extractedText += '\n\n[이미지 OCR 결과]\n' + ocrTexts.join('\n');
+          console.log('[Image OCR] 총', ocrTexts.length, '개 이미지에서 텍스트 추출 완료');
+        } else {
+          console.warn('[Image OCR] 모든 이미지에서 OCR 텍스트 추출 실패');
         }
       }
 
