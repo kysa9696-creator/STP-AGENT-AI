@@ -52,4 +52,4 @@ jobs:
           app-name: 'STP-AI-AGENT'
           slot-name: 'Production'
           package: .
-          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_1281F591AD1B4596B634450D34DD8E38 }}
+          publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_8765BFD925CB4476802897A54919177D }}
