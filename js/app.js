@@ -10,7 +10,7 @@
 const DIFY_API = {
   endpoint : 'https://api.abclab.ktds.com/v1/chat-messages',
   apiKey   : 'app-QziT8XHSpSmJttsdopx6SHfn',
-  userId   : 'stp-agent-user'
+  userId   : 'stp-agent-usera'
 };
 
 /* ============================================================
