@@ -9,8 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 </head>
 <body>
-  <!-- hello ys kkk -->
-  <!-- OKAY JH NICE TO MEET U, LONG TIME NO SEE, HAVE A GOOD TIME, JIB AE GA GO SIP DA -->
   <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="header-inner">
@@ -33,7 +31,7 @@
         <div class="user-status"><span class="status-dot"></span>온라인</div>
         <div class="api-status-indicator" id="apiStatus">
           <span class="status-dot"></span>
-          <span class="api-status-text">STP AI 연결</span>
+          <span class="api-status-text">STP AI 연결됨</span>
         </div>
         <div class="user-avatar"><i class="fa-solid fa-user"></i></div>
       </div>
@@ -259,11 +257,251 @@
     </section>
     <section class="tab-section" id="tab-guide">
       <div class="guide-container">
-        <div class="page-header">
-          <h2><i class="fa-solid fa-circle-info"></i> 이용 안내</h2>
-          <p>STP AI Agent 사용 방법 및 주요 기능을 안내합니다.</p>
+
+        <!-- ===== HERO ===== -->
+        <div class="guide-hero">
+          <div class="guide-hero-badge"><i class="fa-solid fa-microchip"></i> AI Powered</div>
+          <h1 class="guide-hero-title">STP AI Agent</h1>
+          <p class="guide-hero-subtitle">지능형 SAP MM 운영의 새로운 표준</p>
+          <p class="guide-hero-desc">복잡성을 넘어선 <strong>단 하나의 지능형 오케스트레이터</strong><br>업무 공백 제로, 신속하고 표준화된 혁신의 시작</p>
+          <p class="guide-hero-desc"><strong>운영자, AI, 현업 모두 하나로 연결된 STP AI Agent</p>
+          <div class="guide-hero-tags">
+            <span class="hero-tag"><i class="fa-solid fa-bolt"></i> 업무 공백 제로</span>
+            <span class="hero-tag"><i class="fa-solid fa-gauge-high"></i> 신속 대응</span>
+            <span class="hero-tag"><i class="fa-solid fa-scale-balanced"></i> 표준화 운영</span>
+          </div>
         </div>
-        <div class="guide-grid">...</div>
+
+        <!-- ===== PIPELINE ===== -->
+        <div class="guide-pipeline">
+          <h2 class="guide-section-title"><i class="fa-solid fa-diagram-project"></i> End-to-End 파이프라인</h2>
+          <p class="guide-section-desc">KT ds SAP MM(STP 영역) 운영을 지원하는 차세대 AI Agent 파이프라인</p>
+          <div class="pipeline-steps">
+            <div class="pipeline-step">
+              <div class="pipeline-icon"><i class="fa-solid fa-database"></i></div>
+              <div class="pipeline-label">Zone 1</div>
+              <div class="pipeline-title">데이터 축적</div>
+              <ul class="pipeline-list">
+                <li>SAP 매뉴얼</li>
+                <li>업무 프로세스</li>
+                <li>SR 사례</li>
+              </ul>
+            </div>
+            <div class="pipeline-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="pipeline-step">
+              <div class="pipeline-icon"><i class="fa-solid fa-microchip"></i></div>
+              <div class="pipeline-label">Zone 2</div>
+              <div class="pipeline-title">ABC LAB</div>
+              <ul class="pipeline-list">
+                <li>모델 설계</li>
+                <li>LLM + RAG</li>
+                <li>AutoML</li>
+              </ul>
+            </div>
+            <div class="pipeline-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="pipeline-step">
+              <div class="pipeline-icon"><i class="fa-solid fa-server"></i></div>
+              <div class="pipeline-label">Zone 3</div>
+              <div class="pipeline-title">DEV AI</div>
+              <ul class="pipeline-list">
+                <li>API 배포</li>
+                <li>실시간 처리</li>
+                <li>시스템 연동</li>
+              </ul>
+            </div>
+            <div class="pipeline-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+            <div class="pipeline-step highlight">
+              <div class="pipeline-icon"><i class="fa-solid fa-robot"></i></div>
+              <div class="pipeline-label">Zone 4</div>
+              <div class="pipeline-title">STP AI Agent</div>
+              <ul class="pipeline-list">
+                <li>현업 문의 자동응답</li>
+                <li>SR 처리 지원</li>
+                <li>업무 공백 최소화</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== 3 CORE FEATURES ===== -->
+        <div class="guide-features">
+          <h2 class="guide-section-title"><i class="fa-solid fa-star"></i>STP AI Agent 핵심 기능</h2>
+          <p class="guide-section-desc">STP AI Agent가 제공하는 세 가지 핵심 기능</p>
+          <div class="feature-cards">
+            <div class="feature-card">
+              <div class="feature-icon-wrap red">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <h3>그룹사 담당자 R&amp;R 찾기</h3>
+              <p>수많은 그룹사와 복잡한 조직도 속에서 정확한 운영 담당자 정보를 AI가 즉각적으로 찾아드립니다.</p>
+              <div class="feature-tag">누가 담당자인지 헤매지 마세요</div>
+              <div class="feature-example">
+                <div class="example-chat user">
+                  <span class="example-bubble">KT NETCORE 담당자 누구야?</span>
+                </div>
+                <div class="example-chat agent">
+                  <div class="example-bubble example-rich">
+                    <div class="rich-header">👤 KT NETCORE 담당자</div>
+                    <table class="rich-table">
+                      <thead>
+                        <tr><th>담당 영역</th><th>담당자</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr><td>Netcore · P&M · Cloud · Sat</td><td><strong>조혜승 선임 / 김연수 선임</strong></td></tr>
+                      </tbody>
+                    </table>
+                    <div class="rich-note">📌 문의 방법<br>- 담당자에게 직접 연락 하시거나,<br>- ITSM에 등록하여 문의하시면 됩니다!</div>
+                    <div class="rich-tip">💡 KT NETCORE 관련 STP/MM 운영 이슈는 조혜승 선임 또는 김연수 선임에게 문의해 주세요! 😊</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon-wrap blue">
+                <i class="fa-solid fa-clipboard-check"></i>
+              </div>
+              <h3>현업 SR 처리</h3>
+              <p>현업의 문의 및 서비스 요청(SR)을 AI Agent가 밀착 지원하여, 신속하고 일관성 있는 답변과 처리 프로세스를 제공합니다.</p>
+              <div class="feature-tag">빠르고 표준화된 SR 대응</div>
+              <div class="feature-example">
+                <div class="example-chat user">
+                  <span class="example-bubble">KT 구매조직이 뭐야?</span>
+                </div>
+                <div class="example-chat agent">
+                  <div class="example-bubble example-rich">
+                    <div class="rich-header">📋 구매조직 코드 목록</div>
+                    <table class="rich-table">
+                      <thead>
+                        <tr><th>회사</th><th>구매조직 코드</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr><td>KT</td><td><strong>1000</strong></td></tr>
+                        <tr><td>KT Cloud</td><td><strong>1000</strong> (별도 서버)</td></tr>
+                        <tr><td>KT Estate</td><td><strong>1100</strong></td></tr>
+                        <tr><td>KT Sat</td><td><strong>1300</strong></td></tr>
+                        <tr><td>KT Netcore</td><td><strong>1400</strong></td></tr>
+                        <tr><td>KT P&amp;M</td><td><strong>1500</strong></td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="feature-card">
+              <div class="feature-icon-wrap green">
+                <i class="fa-solid fa-folder-tree"></i>
+              </div>
+              <h3>그룹사별 상이한 업무 프로세스 검색</h3>
+              <p>그룹사별로 상이한 업무 프로세스·매뉴얼·담당자 정보를 하나의 AI로 통합 제공하여 Zero-Gap 운영을 실현합니다.</p>
+              <div class="feature-tag">담당자 부재 시에도 공백 없는 운영</div>
+              <div class="feature-example">
+                <div class="example-chat user">
+                  <span class="example-bubble">DIP 계약 관련 티코드 알려줘</span>
+                </div>
+                <div class="example-chat agent">
+                  <div class="example-bubble example-rich">
+                    <div class="rich-header">📋 DIP 관련 주요 T-Code</div>
+                    <div class="rich-subheader">🔹 DIP 요청/조회 관련</div>
+                    <table class="rich-table">
+                      <thead>
+                        <tr><th>티코드</th><th>설명</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr><td><code>ZMMTE01902</code></td><td>DIP 요청관리 (조회)</td></tr>
+                        <tr><td><code>ZMMTE019061</code></td><td>DIP 공사 총액계약 생성</td></tr>
+                        <tr><td><code>ZMMTE019062</code></td><td>DIP 용역 총액계약 생성</td></tr>
+                        <tr><td><code>ZSBMMTE019061_C/P</code></td><td>DIP 요청 생성</td></tr>
+                        <tr><td><code>ZSBMMTE019062_C/P</code></td><td>DIP 요청 변경/조회</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== HOW TO USE ===== -->
+        <div class="guide-howto">
+          <h2 class="guide-section-title"><i class="fa-solid fa-book-open"></i> 사용 방법</h2>
+          <p class="guide-section-desc">STP AI Agent를 쉽게 시작하는 방법</p>
+          <div class="howto-steps">
+            <div class="howto-step">
+              <div class="howto-num">1</div>
+              <div class="howto-content">
+                <h4>카테고리 선택</h4>
+                <p>왼쪽 사이드바에서 업무 카테고리를 선택하세요.<br><strong>그룹사 · 시스템 · 통합 복무 · 공통업무 · 역량강화</strong> 등 다양한 카테고리를 지원합니다.</p>
+              </div>
+            </div>
+            <div class="howto-step">
+              <div class="howto-num">2</div>
+              <div class="howto-content">
+                <h4>빠른 질문 버튼</h4>
+                <p>화면 하단의 빠른 질문 버튼을 클릭하면 자주 묻는 질문을 바로 전송할 수 있습니다.</p>
+              </div>
+            </div>
+            <div class="howto-step">
+              <div class="howto-num">3</div>
+              <div class="howto-content">
+                <h4>직접 질문하기</h4>
+                <p>입력창에 자유롭게 질문하세요. SAP MM, Table &amp; T-code, RFC &amp; 배치, 담당자 연락처 등 다양한 업무를 지원합니다.</p>
+              </div>
+            </div>
+            <div class="howto-step">
+              <div class="howto-num">4</div>
+              <div class="howto-content">
+                <h4>파일 첨부</h4>
+                <p>스크린샷이나 문서를 첨부하면 AI가 내용을 분석하여 답변해 드립니다. <strong>Ctrl+V</strong>로 이미지 붙여넣기도 가능합니다.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== CATEGORIES ===== -->
+        <div class="guide-categories">
+          <h2 class="guide-section-title"><i class="fa-solid fa-layer-group"></i> 지원 카테고리</h2>
+          <p class="guide-section-desc">STP AI Agent가 지원하는 주요 업무 카테고리</p>
+          <div class="category-grid">
+            <div class="cat-card">
+              <div class="cat-icon"><i class="fa-solid fa-building-circle-arrow-right"></i></div>
+              <h4>그룹사</h4>
+              <p>KT, KT Netcore, KT p&m, KT Cloud, KT Alpha, KT Skylife, KT SAT, KT DS, KT Estate, KT Engcore 등 그룹사별 업무 프로세스, 담당자 정보를 제공합니다.</p>
+            </div>
+            <div class="cat-card">
+              <div class="cat-icon"><i class="fa-solid fa-desktop"></i></div>
+              <h4>시스템</h4>
+              <p>EAI, SRM, BPM, ITSM, EASY ERP, EP 등 연계 시스템 정보와 계정/권한 관련 문의를 지원합니다.</p>
+            </div>
+            <div class="cat-card">
+              <div class="cat-icon"><i class="fa-solid fa-user-tie"></i></div>
+              <h4>통합 복무</h4>
+              <p>재택근무, 초과근무, 휴가, 출장 신청 등 복무 관련 시스템 연동을 제공합니다.</p>
+            </div>
+            <div class="cat-card">
+              <div class="cat-icon"><i class="fa-solid fa-users"></i></div>
+              <h4>공통업무</h4>
+              <p>주간 보고, 산출물, TMS 등 공통 업무 관련 문의를 지원합니다.</p>
+            </div>
+            <div class="cat-card">
+              <div class="cat-icon"><i class="fa-solid fa-graduation-cap"></i></div>
+              <h4>역량강화</h4>
+              <p>RAP, S/4HANA, BTP, NEW ABAP 등 SAP 핵심 역량 강화 정보를 제공합니다.</p>
+            </div>
+            <div class="cat-card">
+              <div class="cat-icon"><i class="fa-solid fa-cubes"></i></div>
+              <h4>SAP MM 모듈</h4>
+              <p>구매 프로세스, 자재 관리, PO/PR, MIGO/MIRO 등 SAP MM(Material Management) 모듈 관련 문의를 지원합니다.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== ZERO GAP BANNER ===== -->
+        <div class="guide-zgap">
+          <div class="zgap-icon"><i class="fa-solid fa-infinity"></i></div>
+          <h3>Zero-Gap 운영 실현</h3>
+          <p>그룹사별 상이한 업무 프로세스·매뉴얼·담당자 정보를 하나의 AI로 통합 제공<br>담당자 부재 시에도 공백 없는 <strong>신속·표준화 운영</strong>을 실현합니다.</p>
+        </div>
+
       </div>
     </section>
   </main>
