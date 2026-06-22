@@ -10,7 +10,7 @@
 const DIFY_API = {
   endpoint : 'https://api.abclab.ktds.com/v1/chat-messages',
   apiKey   : 'app-QziT8XHSpSmJttsdopx6SHfn',
-  userId   : 'stp-agent-usera'
+  userId   : 'stp-agent-user'
 };
 
 /* ============================================================
@@ -34,40 +34,49 @@ const state = {
 };
 
 /* ============================================================
-    THEME MANAGEMENT
+    THEME MANAGEMENT (2 themes: light ↔ dark)
     ============================================================ */
 (function initTheme() {
   const themeToggleBtn = document.getElementById('themeToggleBtn');
   const body = document.body;
   
+  const themes = ['light', 'dark'];
+  const themeIcons = {
+    light: '<i class="fa-solid fa-sun"></i>',
+    dark: '<i class="fa-solid fa-moon"></i>'
+  };
+  const themeTitles = {
+    light: '어두운 테마로 전환 🌙',
+    dark: '밝은 테마로 전환 ☀️'
+  };
+  const themeToasts = {
+    light: '밝은 테마가 활성화되었습니다 ☀️',
+    dark: '어두운 테마가 활성화되었습니다 🌙'
+  };
+  
   // 저장된 테마 로드
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme === 'dark') {
-    body.classList.add('dark-theme');
+  const savedTheme = localStorage.getItem('theme') || 'light';
+  applyTheme(savedTheme);
+  
+  function applyTheme(theme) {
+    body.classList.remove('dark-theme');
+    if (theme === 'dark') body.classList.add('dark-theme');
+    
     if (themeToggleBtn) {
-      themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
-      themeToggleBtn.title = '밝은 테마로 전환';
+      themeToggleBtn.innerHTML = themeIcons[theme];
+      themeToggleBtn.title = themeTitles[theme];
     }
   }
   
-  // 테마 토글 버튼 이벤트
+  // 테마 전환 버튼 이벤트 (2-way toggle)
   if (themeToggleBtn) {
     themeToggleBtn.addEventListener('click', function() {
-      body.classList.toggle('dark-theme');
+      const current = body.classList.contains('dark-theme') ? 'dark' : 'light';
+      const nextTheme = current === 'dark' ? 'light' : 'dark';
       
-      if (body.classList.contains('dark-theme')) {
-        // 다크 테마 활성화
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-sun"></i>';
-        themeToggleBtn.title = '밝은 테마로 전환';
-        localStorage.setItem('theme', 'dark');
-        showToast('우주 테마가 활성화되었습니다 🌌', 'info');
-      } else {
-        // 밝은 테마 활성화
-        themeToggleBtn.innerHTML = '<i class="fa-solid fa-moon"></i>';
-        themeToggleBtn.title = '우주 (다크) 테마로 전환';
-        localStorage.setItem('theme', 'light');
-        showToast('밝은 테마로 전환되었습니다 ☀️', 'info');
-      }
+      applyTheme(nextTheme);
+      localStorage.setItem('theme', nextTheme);
+      showToast(themeToasts[nextTheme], 'info');
     });
   }
 })();
