@@ -5,12 +5,12 @@
  */
 
 /* ============================================================
-    DIFY API CONFIG
+    DATASET API CONFIG (Knowledge / RAG)
     ============================================================ */
-const DIFY_API = {
-  endpoint : 'https://api.abclab.ktds.com/v1/chat-messages',
-  apiKey   : 'app-QziT8XHSpSmJttsdopx6SHfn',
-  userId   : 'stp-agent-user'
+const DATASET_API = {
+  baseUrl    : 'https://api.abclab.ktds.com/v1',
+  apiKey     : 'dataset-fOGqbX2rbavh2a5nQ6TXUGiQ',
+  datasetId  : 'fOGqbX2rbavh2a5nQ6TXUGiQ'
 };
 
 /* ============================================================
@@ -454,6 +454,12 @@ document.querySelector('.category-list').addEventListener('click', (e) => {
     return;
   }
   
+  // 지식모음(Knowledge) 카테고리 처리 — Dataset API 연동
+  if (category === 'knowledge') {
+    renderKnowledgeHome();
+    return;
+  }
+  
   // 기타 카테고리 클릭 시 기본 동작
   const chatMessages = document.getElementById('chatMessages');
   if (chatMessages) {
@@ -551,6 +557,397 @@ function showCapabilityCards() {
 // BJH 추가 end
 
 /* ============================================================
+  KNOWLEDGE MODULE — Dataset API 연동
+  ============================================================ */
+
+// Dataset API 호출 헬퍼 (직접 호출 - DIFY_API 패턴 동일)
+async function datasetApiCall(path, options = {}) {
+  const url = DATASET_API.baseUrl + path;
+  const res = await fetch(url, {
+    headers: {
+      'Authorization': 'Bearer ' + DATASET_API.apiKey,
+      'Content-Type': 'application/json'
+    },
+    ...options
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error('Dataset API ' + res.status + ': ' + errText);
+  }
+  return res.json();
+}
+
+// 지식 목록 조회 (GET /datasets)
+async function fetchKnowledgeList() {
+  const data = await datasetApiCall('/datasets');
+  return data.data || data.datasets || [];
+}
+
+// 지식 검색 (POST /datasets/{dataset_id}/retrieve)
+async function fetchKnowledgeSearch(query) {
+  const data = await datasetApiCall('/datasets/' + DATASET_API.datasetId + '/retrieve', {
+    method: 'POST',
+    body: JSON.stringify({
+      query: query,
+      retrieval_model: {
+        search_method: 'hybrid_search',
+        reranking_enable: false,
+        top_k: 10,
+        score_threshold_enabled: false
+      }
+    })
+  });
+  return data;
+}
+
+// 지식 생성 (POST /api/knowledge/datasets via proxy)
+async function createKnowledge(name, description) {
+  const data = await datasetApiCall('/datasets', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: name,
+      description: description || '',
+      permission: 'all_team_members',
+      retrieval_model: {
+        search_method: 'hybrid_search',
+        reranking_enable: true,
+        reranking_model: {
+          reranking_provider_name: 'cohere',
+          reranking_model_name: 'rerank-multilingual-v3'
+        },
+        top_k: 15,
+        score_threshold_enabled: true,
+        score_threshold: 0.7
+      }
+    })
+  });
+  return data;
+}
+
+// Knowledge 홈 화면 렌더링
+function renderKnowledgeHome() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:900px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-brain"></i></div>' +
+      '<h2>STP AI Knowledge</h2>' +
+      '<p>KT DS 특화 지식을 RAG + LLM 모델에 학습시켜 더 정확하고 유용한 답변을 제공합니다.<br/>아래에서 지식을 검색하거나 새로운 지식을 추가해 주세요.</p>' +
+      '<div class="knowledge-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;">' +
+        '<button class="quick-btn" id="knowledgeSearchBtn" style="padding:16px;font-size:15px;">' +
+          '<i class="fa-solid fa-magnifying-glass"></i> 지식 검색' +
+        '</button>' +
+        '<button class="quick-btn" id="knowledgeCreateBtn" style="padding:16px;font-size:15px;">' +
+          '<i class="fa-solid fa-plus-circle"></i> 지식 추가' +
+        '</button>' +
+        '<button class="quick-btn" id="knowledgeListBtn" style="padding:16px;font-size:15px;">' +
+          '<i class="fa-solid fa-list"></i> 지식 목록' +
+        '</button>' +
+        '<button class="quick-btn" id="knowledgeUpdateBtn" style="padding:16px;font-size:15px;">' +
+          '<i class="fa-solid fa-pen-to-square"></i> 지식 수정' +
+        '</button>' +
+      '</div>' +
+    '</div>';
+
+  // 버튼 바인딩
+  const searchBtn = document.getElementById('knowledgeSearchBtn');
+  if (searchBtn) searchBtn.addEventListener('click', function() { renderKnowledgeSearch(); });
+
+  const createBtn = document.getElementById('knowledgeCreateBtn');
+  if (createBtn) createBtn.addEventListener('click', function() { renderKnowledgeCreate(); });
+
+  const listBtn = document.getElementById('knowledgeListBtn');
+  if (listBtn) listBtn.addEventListener('click', function() { loadKnowledgeList(); });
+
+  const updateBtn = document.getElementById('knowledgeUpdateBtn');
+  if (updateBtn) updateBtn.addEventListener('click', function() { renderKnowledgeUpdate(); });
+}
+
+// 지식 검색 화면
+function renderKnowledgeSearch() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-magnifying-glass"></i></div>' +
+      '<h2>지식 검색</h2>' +
+      '<p>STP AI Knowledge Base 에서 원하는 지식을 검색해 보세요.</p>' +
+      '<div style="display:flex;gap:10px;margin-top:20px;">' +
+        '<input type="text" id="knowledgeSearchInput" placeholder="검색어를 입력하세요..." style="flex:1;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-primary);"/>' +
+        '<button class="quick-btn" id="knowledgeSearchGoBtn" style="padding:12px 24px;white-space:nowrap;"><i class="fa-solid fa-search"></i> 검색</button>' +
+      '</div>' +
+      '<div id="knowledgeSearchResults" style="margin-top:20px;text-align:left;"></div>' +
+      '<button class="quick-btn" id="knowledgeBackHome" style="margin-top:16px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+    '</div>';
+
+  document.getElementById('knowledgeSearchGoBtn').addEventListener('click', function() {
+    const query = document.getElementById('knowledgeSearchInput').value.trim();
+    if (query) executeKnowledgeSearch(query);
+  });
+
+  const input = document.getElementById('knowledgeSearchInput');
+  if (input) {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const query = input.value.trim();
+        if (query) executeKnowledgeSearch(query);
+      }
+    });
+  }
+
+  const backBtn = document.getElementById('knowledgeBackHome');
+  if (backBtn) backBtn.addEventListener('click', function() { renderKnowledgeHome(); });
+
+  input.focus();
+}
+
+// 지식 검색 실행
+async function executeKnowledgeSearch(query) {
+  const resultsDiv = document.getElementById('knowledgeSearchResults');
+  resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">검색 중...</span></div>';
+
+  try {
+    const data = await fetchKnowledgeSearch(query);
+    const docs = data.docs || data.data || [];
+
+    if (docs.length === 0) {
+      resultsDiv.innerHTML = '<div style="text-align:center;padding:30px;background:var(--bg-secondary);border-radius:12px;"><i class="fa-solid fa-folder-open" style="font-size:36px;color:var(--text-secondary);margin-bottom:12px;"></i><br/><strong>검색 결과가 없습니다</strong><br/><span style="font-size:13px;color:var(--text-secondary);">"' + escapeHtml(query) + '" 에 대한 지식이 아직 등록되지 않았습니다.</span></div>';
+      return;
+    }
+
+    let html = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;"><i class="fa-solid fa-check-circle" style="color:var(--kt-green);"></i> ' + docs.length + ' 개의 지식 항목을 찾았습니다.</div>';
+
+    docs.forEach(function(doc, i) {
+      const content = doc.content || doc.page_content || doc.text || '내용 없음';
+      const source = doc.source || doc.metadata?.source || '';
+      const score = doc.score !== undefined ? ' (관련도: ' + (doc.score * 100).toFixed(1) + '%)' : '';
+
+      html += '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:16px;margin-bottom:12px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+          '<strong style="color:var(--kt-red);"><i class="fa-solid fa-file-lines"></i> 지식 #' + (i + 1) + score + '</strong>' +
+          (source ? '<span style="font-size:11px;color:var(--text-secondary);background:var(--bg-secondary);padding:2px 8px;border-radius:4px;">' + escapeHtml(source) + '</span>' : '') +
+        '</div>' +
+        '<div style="font-size:13px;line-height:1.7;color:var(--text-primary);white-space:pre-wrap;">' + escapeHtml(content).substring(0, 1000) + '</div>' +
+      '</div>';
+    });
+
+    resultsDiv.innerHTML = html;
+  } catch (err) {
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 검색 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// 지식 목록 로드
+async function loadKnowledgeList() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-list"></i></div>' +
+      '<h2>지식 목록</h2>' +
+      '<p>등록된 모든 지식(Dataset) 목록입니다.</p>' +
+      '<div id="knowledgeListResults" style="margin-top:20px;text-align:left;">' +
+        '<div style="text-align:center;padding:20px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">로딩 중...</span></div>' +
+      '</div>' +
+      '<button class="quick-btn" id="knowledgeBackHome" style="margin-top:16px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+    '</div>';
+
+  const backBtn = document.getElementById('knowledgeBackHome');
+  if (backBtn) backBtn.addEventListener('click', function() { renderKnowledgeHome(); });
+
+  try {
+    const datasets = await fetchKnowledgeList();
+    const resultsDiv = document.getElementById('knowledgeListResults');
+
+    if (!datasets || datasets.length === 0) {
+      resultsDiv.innerHTML = '<div style="text-align:center;padding:30px;background:var(--bg-secondary);border-radius:12px;"><i class="fa-solid fa-database" style="font-size:36px;color:var(--text-secondary);margin-bottom:12px;"></i><br/><strong>등록된 지식이 없습니다</strong><br/><span style="font-size:13px;color:var(--text-secondary);">새로운 지식을 추가해 주세요.</span></div>';
+      return;
+    }
+
+    let html = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;"><i class="fa-solid fa-check-circle" style="color:var(--kt-green);"></i> ' + datasets.length + ' 개의 지식 항목이 등록되어 있습니다.</div>';
+
+    datasets.forEach(function(ds, i) {
+      const name = ds.name || '제목 없음';
+      const desc = ds.description || '';
+      const id = ds.id || '';
+      const status = ds.indexing_status || ds.status || '';
+      const created = ds.created_at ? new Date(ds.created_at * 1000).toLocaleDateString('ko-KR') : '';
+
+      html += '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:16px;margin-bottom:12px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+          '<strong style="color:var(--kt-red);"><i class="fa-solid fa-database"></i> ' + escapeHtml(name) + '</strong>' +
+          '<span style="font-size:11px;color:var(--text-secondary);">' + escapeHtml(status) + '</span>' +
+        '</div>' +
+        (desc ? '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">' + escapeHtml(desc) + '</div>' : '') +
+        '<div style="font-size:11px;color:var(--text-secondary);">ID: ' + escapeHtml(id) + (created ? ' · 등록일: ' + created : '') + '</div>' +
+      '</div>';
+    });
+
+    resultsDiv.innerHTML = html;
+  } catch (err) {
+    const resultsDiv = document.getElementById('knowledgeListResults');
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 목록 조회 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// 지식 추가 화면
+function renderKnowledgeCreate() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:700px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-plus-circle"></i></div>' +
+      '<h2>새 지식 추가</h2>' +
+      '<p>새로운 지식(Dataset)을 생성해 STP AI 에 학습시켜 주세요.</p>' +
+      '<div style="margin-top:20px;">' +
+        '<label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:var(--text-primary);">지식 이름 *</label>' +
+        '<input type="text" id="knowledgeNameInput" placeholder="예: STP 구매 프로세스 가이드" style="width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-primary);box-sizing:border-box;margin-bottom:16px;"/>' +
+        '<label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:var(--text-primary);">설명</label>' +
+        '<textarea id="knowledgeDescInput" placeholder="지식에 대한 설명을 입력하세요..." rows="4" style="width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-primary);box-sizing:border-box;resize:vertical;margin-bottom:20px;"></textarea>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;">' +
+        '<button class="quick-btn" id="knowledgeCreateGoBtn" style="padding:12px 24px;"><i class="fa-solid fa-plus"></i> 생성하기</button>' +
+        '<button class="quick-btn" id="knowledgeBackHome" style="padding:12px 24px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 취소</button>' +
+      '</div>' +
+      '<div id="knowledgeCreateResult" style="margin-top:16px;"></div>' +
+    '</div>';
+
+  document.getElementById('knowledgeCreateGoBtn').addEventListener('click', function() {
+    const name = document.getElementById('knowledgeNameInput').value.trim();
+    const desc = document.getElementById('knowledgeDescInput').value.trim();
+    if (!name) {
+      document.getElementById('knowledgeCreateResult').innerHTML = '<div style="color:var(--kt-red);font-size:13px;"><i class="fa-solid fa-circle-exclamation"></i> 지식 이름을 입력해 주세요.</div>';
+      return;
+    }
+    executeKnowledgeCreate(name, desc);
+  });
+
+  const backBtn = document.getElementById('knowledgeBackHome');
+  if (backBtn) backBtn.addEventListener('click', function() { renderKnowledgeHome(); });
+
+  document.getElementById('knowledgeNameInput').focus();
+}
+
+// 지식 생성 실행
+async function executeKnowledgeCreate(name, desc) {
+  const resultDiv = document.getElementById('knowledgeCreateResult');
+  resultDiv.innerHTML = '<div style="text-align:center;padding:16px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:20px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">생성 중...</span></div>';
+
+  try {
+    const data = await createKnowledge(name, desc);
+    const id = data.id || data.dataset_id || '';
+    resultDiv.innerHTML =
+      '<div style="background:var(--bg-card);border:1px solid var(--kt-green);border-radius:10px;padding:16px;text-align:center;">' +
+        '<i class="fa-solid fa-circle-check" style="font-size:28px;color:var(--kt-green);margin-bottom:8px;"></i><br/>' +
+        '<strong style="color:var(--kt-green);">지식 생성 완료!</strong><br/>' +
+        '<span style="font-size:13px;color:var(--text-secondary);">ID: ' + escapeHtml(id) + '</span><br/>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">이제 파일 업로드 또는 텍스트 입력으로 지식을 채워주세요.</span>' +
+      '</div>';
+  } catch (err) {
+    resultDiv.innerHTML = '<div style="color:var(--kt-red);font-size:13px;"><i class="fa-solid fa-triangle-exclamation"></i> 생성 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// 지식 수정 화면
+function renderKnowledgeUpdate() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-pen-to-square"></i></div>' +
+      '<h2>지식 수정</h2>' +
+      '<p>기존 지식의 검색 설정을 수정하거나 내용을 업데이트할 수 있습니다.</p>' +
+      '<div style="margin-top:20px;">' +
+        '<label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:var(--text-primary);">검색어 기반 지식 조회</label>' +
+        '<div style="display:flex;gap:10px;">' +
+          '<input type="text" id="knowledgeUpdateQuery" placeholder="수정할 지식을 검색하세요..." style="flex:1;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-primary);"/>' +
+          '<button class="quick-btn" id="knowledgeUpdateSearchBtn" style="padding:12px 20px;white-space:nowrap;"><i class="fa-solid fa-search"></i> 조회</button>' +
+        '</div>' +
+      '</div>' +
+      '<div id="knowledgeUpdateResults" style="margin-top:20px;text-align:left;"></div>' +
+      '<button class="quick-btn" id="knowledgeBackHome" style="margin-top:16px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+    '</div>';
+
+  document.getElementById('knowledgeUpdateSearchBtn').addEventListener('click', function() {
+    const query = document.getElementById('knowledgeUpdateQuery').value.trim();
+    if (query) executeKnowledgeSearchForUpdate(query);
+  });
+
+  const input = document.getElementById('knowledgeUpdateQuery');
+  if (input) {
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') {
+        const query = input.value.trim();
+        if (query) executeKnowledgeSearchForUpdate(query);
+      }
+    });
+  }
+
+  const backBtn = document.getElementById('knowledgeBackHome');
+  if (backBtn) backBtn.addEventListener('click', function() { renderKnowledgeHome(); });
+
+  input.focus();
+}
+
+// 지식 수정용 검색 실행
+async function executeKnowledgeSearchForUpdate(query) {
+  const resultsDiv = document.getElementById('knowledgeUpdateResults');
+  resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">조회 중...</span></div>';
+
+  try {
+    const data = await fetchKnowledgeSearch(query);
+    const docs = data.docs || data.data || [];
+
+    if (docs.length === 0) {
+      resultsDiv.innerHTML = '<div style="text-align:center;padding:30px;background:var(--bg-secondary);border-radius:12px;"><i class="fa-solid fa-folder-open" style="font-size:36px;color:var(--text-secondary);margin-bottom:12px;"></i><br/><strong>검색 결과가 없습니다</strong></div>';
+      return;
+    }
+
+    let html = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;"><i class="fa-solid fa-check-circle" style="color:var(--kt-green);"></i> ' + docs.length + ' 개의 지식 항목을 찾았습니다.</div>';
+
+    docs.forEach(function(doc, i) {
+      const content = doc.content || doc.page_content || doc.text || '내용 없음';
+      const docId = doc.id || doc.document_id || '';
+
+      html += '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:16px;margin-bottom:12px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+          '<strong style="color:var(--kt-red);"><i class="fa-solid fa-file-lines"></i> 지식 #' + (i + 1) + '</strong>' +
+          '<span style="font-size:11px;color:var(--text-secondary);">ID: ' + escapeHtml(docId) + '</span>' +
+        '</div>' +
+        '<div style="font-size:13px;line-height:1.7;color:var(--text-primary);white-space:pre-wrap;margin-bottom:10px;">' + escapeHtml(content).substring(0, 800) + '</div>' +
+        '<div style="display:flex;gap:8px;">' +
+          '<button class="quick-btn knowledge-edit-btn" data-doc-id="' + escapeHtml(docId) + '" style="padding:6px 14px;font-size:12px;"><i class="fa-solid fa-pen"></i> 수정</button>' +
+          '<button class="quick-btn knowledge-delete-btn" data-doc-id="' + escapeHtml(docId) + '" style="padding:6px 14px;font-size:12px;background:var(--bg-secondary);"><i class="fa-solid fa-trash"></i> 삭제</button>' +
+        '</div>' +
+      '</div>';
+    });
+
+    resultsDiv.innerHTML = html;
+
+    // 수정/삭제 버튼 바인딩
+    resultsDiv.querySelectorAll('.knowledge-edit-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const docId = this.dataset.docId;
+        showToast('지식 수정: ' + docId + ' (Dify Dashboard 에서 직접 수정)', 'info');
+      });
+    });
+    resultsDiv.querySelectorAll('.knowledge-delete-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const docId = this.dataset.docId;
+        showToast('지식 삭제: ' + docId + ' (Dify Dashboard 에서 직접 삭제)', 'info');
+      });
+    });
+  } catch (err) {
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 조회 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+/* ============================================================
   STP 운영 담당자 연락처 키워드 감지 및 즉시 응답
    ============================================================ */
 const CONTACT_KEYWORDS = ['STP 담당자','STP 연락처','STP 담당부서','STP 운영 담당','STP 운영담당','STP 담당자 연락','STP 책임자'];
@@ -566,7 +963,16 @@ function isContactQuery(text) {
   }
   
   // 담당자/연락처 키워드가 포함되면 무조건 담당자 연락처로 처리 (우선순위 최상)
-  const contactKeywords = ['STP 담당자','STP 담당부서','STP 운영 담당','STP 운영담당','담당자 연락처','연락처 알려주세요','담당자 알려주세요'];
+  // AI 모델의 PII 마스킹을 우회하기 위해 최대한 넓은 범위로 감지
+  const contactKeywords = [
+    'STP 담당자','STP 담당부서','STP 운영 담당','STP 운영담당','담당자 연락처','연락처 알려주세요','담당자 알려주세요',
+    // 일반 담당자/연락처 키워드 (AI 응답 대신 하드코딩 테이블 사용)
+    '담당자','연락처','담당부서','운영 담당','운영담당','담당자 연락','책임자',
+    '전화번호','전화번호 알려','연락 방법','연락처','전화','휴대폰','핸드폰',
+    '누가 담당','누가 책임','누구에게','누구한테','문의처','문의 방법',
+    'alpha 담당자','alpha 담당','알파 담당자','알파 담당',
+    'netcore 담당','넷코어 담당','p&m 담당','클라우드 담당','skylife 담당','스카이라이프 담당'
+  ];
   if (contactKeywords.some(function(kw) { return text.includes(kw); })) {
     return true;
   }
