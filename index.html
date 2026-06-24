@@ -149,20 +149,41 @@
                  <i class="fa-solid fa-desktop"></i>
                  <span>시스템</span>
                  </li>
-            <li class="category-item" data-category="works">
-              <i class="fa-solid fa-user"></i>
-              <span>통합 복무</span>
-            </li>
-            <li class="category-item" data-category="shortcut">
-              <i class="fa-solid fa-users"></i>
-              <span>공통업무</span>
-            </li>
-            <li class="category-item" data-category="capability">
-              <i class="fa-solid fa-graduation-cap"></i>
-              <span>역량강화</span>
+              <li class="tree-item" data-category="works">
+                <div class="tree-title">
+                  <i class="fa-solid fa-user"></i>
+                  <span>통합 복무</span>
+                  <i class="fa-solid fa-chevron-down arrow"></i>
+                </div>
+                <ul class="tree-menu">
+                  <li class="tree-item" data-category="shortcut">
+                    <div class="tree-title">
+                      <span>공통업무</span>
+                    </div>
+                  </li>
+                  <li class="tree-item" data-category="worksupport">
+                    <div class="tree-title">
+                      <span>업무지원</span>
+                    </div>
+                  </li>
+                </ul>
+              </li>
+             <li class="tree-item" data-category="capability">
+              <div class="tree-title">
+                <i class="fa-solid fa-graduation-cap"></i>
+                <span>역량강화</span>
+                <i class="fa-solid fa-chevron-down arrow"></i>
+              </div>
+              <ul class="tree-menu">
+                <li class="tree-item" data-category="education">
+                  <div class="tree-title">
+                    <span>교육사이트</span>
+                  </div>
+                </li>
+              </ul>
             </li>
             <li class="category-item" data-category="knowledge">
-              <i class="fa-solid fa-brain"></i>
+              <i class="fa-solid fa-lightbulb"></i>
               <span>Knowledge</span>
             </li>
             <li class="category-item" data-category="etc">
@@ -553,6 +574,6 @@
   <!-- Document Text Extraction Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <script src="js/app.js?v=2.0.1"></script>
+  <script src="js/app.js?v=2.0.5"></script>
 </body>
 </html>
