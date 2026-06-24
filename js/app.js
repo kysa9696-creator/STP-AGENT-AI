@@ -428,9 +428,9 @@ function showShortcutCards() {
 
       // TMS
       '<a href="https://tms.ktds.co.kr/tms/tm/tma002.run" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
-        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(16,185,129,0.1);margin-bottom:12px;"><i class="fa-solid fa-share-nodes" style="font-size:22px;color:var(--kt-blue);"></i></div>' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(16,185,129,0.1);margin-bottom:12px;"><i class="fa-solid fa-share-nodes" style="font-size:22px;color:#3b82f6;"></i></div>' +
         '<strong style="font-size:14px;margin-bottom:4px;">TMS</strong>' +
-        '<span style="font-size:12px;color:var(--text-secondary);">팀 TMS 입력</span>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">TMS 입력</span>' +
       '</a>' +
 
       // TMS(팀)
