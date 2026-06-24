@@ -5,6 +5,15 @@
  */
 
 /* ============================================================
+    DIFY API CONFIG
+    ============================================================ */
+const DIFY_API = {
+  endpoint : 'https://api.abclab.ktds.com/v1/chat-messages',
+  apiKey   : 'app-QziT8XHSpSmJttsdopx6SHfn',
+  userId   : 'stp-agent-user'
+};
+
+/* ============================================================
     DATASET API CONFIG (Knowledge / RAG)
     ============================================================ */
 const DATASET_API = {
@@ -171,7 +180,16 @@ function openPage(type) {
     case 'FAQ':
       window.open('https://gdrive.kt.co.kr/channel/2693/edit?itemIdx=119622', '_blank');
       break;
+    case 'meeting':
+      window.open('https://srs.ktds.co.kr:8443/front/allFloorsMeeting.do', '_blank');
+      break;
+    case 'market':
+      window.open('https://ktdstu.com/gnuboard-gnuboard5-6416560/index.php', '_blank');
+      break;
     default:
+    case 'smartwork':
+      window.open('https://srs.ktds.co.kr:8443/front/webFloor.do', '_blank');
+      break;
 //      location.href = 'https://works.ktds.co.kr/group/main';
       window.open('https://works.ktds.co.kr/group/main', '_blank');
       break;
@@ -199,11 +217,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const groupCompanies = document.querySelectorAll(".group-company");
   groupCompanies.forEach(company => {
     const title = company.querySelector(".tree-title");
-    const companyName = company.getAttribute("data-company");
-    const companyLabel = title.querySelector("span").textContent.trim();
+    if (!title) return;
     
-    if (title) {
-      title.addEventListener("click", function(e) {
+    const companyName = company.getAttribute("data-company");
+    const spanEl = title.querySelector("span");
+    if (!spanEl) return;
+    const companyLabel = spanEl.textContent.trim();
+    
+    title.addEventListener("click", function(e) {
         e.stopPropagation(); // 이벤트 버블링 방지
         
         // 아이콘 설정 (회사별로 다른 아이콘 사용 가능)
@@ -262,23 +283,24 @@ document.addEventListener("DOMContentLoaded", () => {
           bindQuickButtons();
         }
       });
-    }
   });
   
   // 기타 메뉴 클릭 시 기본 welcome 카드 복원
   document.querySelectorAll(".tree-title").forEach(title => {
     title.addEventListener("click", function(e) {
       const item = title.closest(".tree-item");
-      // 그룹사가 아니면 기본 카드 복원
-      if (!item.classList.contains("group-company") && !item.closest(".group-company")) {
+      // 그룹사가 아니면 기본 카드 복원 (역량강화/교육사이트는 제외)
+const hasExcludedCategory = item.closest('[data-category="capability"]') || item.closest('[data-category="education"]') || item.closest('[data-category="works"]') || item.closest('[data-category="shortcut"]') || item.closest('[data-category="worksupport"]');
+      if (!item.classList.contains("group-company") && !item.closest(".group-company") && !hasExcludedCategory) {
         e.stopPropagation();
         
         const welcomeCard = document.querySelector(".welcome-card");
+        if (!welcomeCard) return; // Knowledge/교육사이트 화면에서는 스킵
+        
         const welcomeIcon = welcomeCard.querySelector(".welcome-icon i");
         const welcomeTitle = welcomeCard.querySelector("h2");
         const welcomeDesc = welcomeCard.querySelector("p");
         const quickBtnsContainer = welcomeCard.querySelector(".quick-btns");
-        const categorySelect = document.getElementById("msgCategory");
         
         if (welcomeIcon) {
           welcomeIcon.className = "";
@@ -308,7 +330,6 @@ document.addEventListener("DOMContentLoaded", () => {
             '<button class="quick-btn" data-msg="STP에서 업무할 때 주로 사용하는 연계 시스템에 대해서 알려주세요"><i class="fa-solid fa-desktop"></i> 시스템</button>' +
             '<button class="quick-btn" data-msg="MM RFC & 배치에 대해 알려주세요"><i class="fa-solid fa-network-wired"></i> MM RFC & 배치</button>' +
             '<button class="quick-btn" data-msg="STP 운영 담당부서를 알려주세요"><i class="fa-solid fa-address-book"></i> 담당자 연락처</button>';
-          // 새로 생성된 버튼에 이벤트 리스너 바인딩
           bindQuickButtons();
         }
       }
@@ -328,144 +349,266 @@ document.querySelector('.category-list').addEventListener('click', (e) => {
   }
 }); */
 
+// 통합 복무 카드 표시 함수
+function showWorksCards() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-user"></i></div>' +
+      '<h2>통합 복무</h2>' +
+      '<p>복무 관련 신청 및 예약을 한 곳에서 처리할 수 있습니다.</p>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;">' +
+
+      // 재택근무 신청
+      '<a href="https://works.ktds.co.kr/group/wms/workingfromhome" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(226,0,42,0.1);margin-bottom:12px;"><i class="fa-solid fa-house-chimney-user" style="font-size:22px;color:var(--kt-red);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">재택근무 신청</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">재택근무 신청 및 조회</span>' +
+      '</a>' +
+
+      // 초과근무 신청
+      '<a href="https://works.ktds.co.kr/group/wms/overtime" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(37,99,235,0.1);margin-bottom:12px;"><i class="fa-solid fa-clock-rotate-left" style="font-size:22px;color:var(--kt-blue);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">초과근무 신청</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">초과근무 신청 및 조회</span>' +
+      '</a>' +
+
+      // 휴가 신청
+      '<a href="https://works.ktds.co.kr/group/wms/holiday" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(16,185,129,0.1);margin-bottom:12px;"><i class="fa-solid fa-umbrella-beach" style="font-size:22px;color:var(--kt-green);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">휴가 신청</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">휴가 신청 및 잔여일 조회</span>' +
+      '</a>' +
+
+      // 출장 신청
+      '<a href="https://works.ktds.co.kr/group/wms/businesstrip" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(245,158,11,0.1);margin-bottom:12px;"><i class="fa-solid fa-plane-departure" style="font-size:22px;color:#f59e0b;"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">출장 신청</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">출장 신청 및 조회</span>' +
+      '</a>' +
+
+      '</div>' +
+      '<button class="quick-btn" id="worksBackHome" style="margin-top:20px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+    '</div>';
+
+  const backBtn = document.getElementById('worksBackHome');
+  if (backBtn) backBtn.addEventListener('click', function() { renderDefaultWelcomeCard(); });
+}
+
+// 공통업무 카드 표시 함수
+function showShortcutCards() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-users"></i></div>' +
+      '<h2>공통 업무</h2>' +
+      '<p>팀 공통 업무 관련 링크를 제공합니다.</p>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;">' +
+
+      // 주간 보고
+      '<a href="https://ktds-kms.atlassian.net/wiki/spaces/ERPX/pages/253081942/STP" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(226,0,42,0.1);margin-bottom:12px;"><i class="fa-solid fa-users-viewfinder" style="font-size:22px;color:var(--kt-red);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">주간 보고</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">주간 업무 보고</span>' +
+      '</a>' +
+
+      // MM 산출물
+      '<a href="https://ktds-kms.atlassian.net/wiki/spaces/ERP/pages/159359809/MM" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(37,99,235,0.1);margin-bottom:12px;"><i class="fa-solid fa-folder-open" style="font-size:22px;color:var(--kt-blue);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">MM 산출물</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">계약/구매/물류 산출물</span>' +
+      '</a>' +
+
+      // TMS(팀)
+      '<a href="https://gdrive.kt.co.kr/link/EOQwRhmq4Uy6mqJxsPy-IQ?ccd=1014" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(16,185,129,0.1);margin-bottom:12px;"><i class="fa-solid fa-share-nodes" style="font-size:22px;color:var(--kt-green);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">TMS(팀)</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">팀 TMS 공유</span>' +
+      '</a>' +
+
+      // TMS(STP)
+      '<a href="https://gdrive.kt.co.kr/channel/968/edit?itemIdx=344094" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(245,158,11,0.1);margin-bottom:12px;"><i class="fa-solid fa-share-nodes" style="font-size:22px;color:#f59e0b;"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">TMS(STP)</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">STP TMS 공유</span>' +
+      '</a>' +
+
+      // 프로그램/연동/배치
+      '<a href="https://gdrive.kt.co.kr/channel/968/edit?itemIdx=321110" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(139,92,246,0.1);margin-bottom:12px;"><i class="fa-solid fa-code-branch" style="font-size:22px;color:#8b5cf6;"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">프로그램/연동/배치</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">프로그램 및 연동 정보</span>' +
+      '</a>' +
+
+      // MM 문의 정리
+      '<a href="https://gdrive.kt.co.kr/channel/2693/edit?itemIdx=119622" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(236,72,153,0.1);margin-bottom:12px;"><i class="fa-solid fa-clipboard-list" style="font-size:22px;color:#ec4899;"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">MM 문의 정리</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">MM FAQ 및 문의 정리</span>' +
+      '</a>' +
+
+      '</div>' +
+      '<button class="quick-btn" id="shortcutBackHome" style="margin-top:20px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+    '</div>';
+
+  const backBtn = document.getElementById('shortcutBackHome');
+  if (backBtn) backBtn.addEventListener('click', function() { renderDefaultWelcomeCard(); });
+}
+
+// 업무지원 카드 표시 함수
+function showWorkSupportCards() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-briefcase"></i></div>' +
+      '<h2>업무지원</h2>' +
+      '<p>업무에 필요한 지원 서비스와 도구를 제공합니다.</p>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;">' +
+
+      // 스마트워크 예약
+      '<a href="https://srs.ktds.co.kr:8443/front/webFloor.do" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(139,92,246,0.1);margin-bottom:12px;"><i class="fa-solid fa-computer" style="font-size:22px;color:#8b5cf6;"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">스마트워크 예약</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">스마트워크 공간 예약</span>' +
+      '</a>' +
+
+      // 회의실 예약
+      '<a href="https://srs.ktds.co.kr:8443/front/allFloorsMeeting.do" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(236,72,153,0.1);margin-bottom:12px;"><i class="fa-solid fa-people-group" style="font-size:22px;color:#ec4899;"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">회의실 예약</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">회의실 예약 및 조회</span>' +
+      '</a>' +
+
+      // ds 나눔장터
+      '<a href="https://ktdstu.com/gnuboard-gnuboard5-6416560/index.php" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(226,0,42,0.1);margin-bottom:12px;"><i class="fa-solid fa-hand-holding-heart" style="font-size:22px;color:var(--kt-red);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">ds 나눔장터</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">KT DS 나눔장터</span>' +
+      '</a>' +
+
+      '</div>' +
+      '<button class="quick-btn" id="worksupportBackHome" style="margin-top:20px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+    '</div>';
+
+  const backBtn = document.getElementById('worksupportBackHome');
+  if (backBtn) backBtn.addEventListener('click', function() { renderDefaultWelcomeCard(); });
+}
+
 // 역량강화 카테고리 클릭 시 4 개 카드 표시
-document.querySelector('.category-list').addEventListener('click', (e) => {
-  const item = e.target.closest('.category-item');
-  if (!item) return;
-  
-  const category = item.dataset.category;
-  const action = item.dataset.action;
-  
-  // hide-chat 액션이 있는 경우 (공통업무)
-  if (action === 'hide-chat') {
+(function() {
+  const categoryList = document.querySelector('.category-list');
+  if (!categoryList) {
+    console.warn('[app.js] category-list not found, skipping click handler');
+    return;
+  }
+  categoryList.addEventListener('click', (e) => {
+  // 1. 하위 메뉴 클릭 처리 (data-category가 있는 요소) - 우선순위 높음
+  const item = e.target.closest('[data-category]');
+  if (item) {
+    const category = item.dataset.category;
+    const action = item.dataset.action;
+    
+    // 역량강화/교육사이트/통합복무 클릭 시 이벤트 버블링 차단 (DOMContentLoaded 핸들러와 충돌 방지)
+    if (category === 'capability' || category === 'education' || category === 'works' || category === 'shortcut' || category === 'worksupport') {
+      e.stopPropagation();
+    }
+    
+    // hide-chat 액션이 있는 경우 (공통업무)
+    if (action === 'hide-chat') {
+      const chatMessages = document.getElementById('chatMessages');
+      if (chatMessages) {
+        chatMessages.style.display = 'none';
+        if (category === 'shortcut') {
+          chatMessages.style.display = 'flex';
+          chatMessages.innerHTML = 
+            '<div class="welcome-card">' +
+              '<div class="welcome-icon"><i class="fa-solid fa-users"></i></div>' +
+              '<h2>공통 업무 시스템</h2>' +
+              '<p>공통 업무와 관련된 문의는 아래 버튼을 클릭하거나 직접 질문해 주세요.</p>' +
+              '<div class="quick-btns" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px;">' +
+                '<button class="quick-btn" data-msg="결재 시스템 알려줘"><i class="fa-solid fa-check-double"></i> 결재 시스템</button>' +
+                '<button class="quick-btn" data-msg="문서 관리 방법"><i class="fa-solid fa-file"></i> 문서 관리</button>' +
+                '<button class="quick-btn" data-msg="회의실 예약 방법"><i class="fa-solid fa-calendar-check"></i> 회의실 예약</button>' +
+                '<button class="quick-btn" data-msg="내부 연락처 문의"><i class="fa-solid fa-address-book"></i> 연락처</button>' +
+              '</div>' +
+              '<button class="quick-btn" onclick="location.reload()" style="margin-top: 16px; background: var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+            '</div>';
+          bindQuickButtons();
+        }
+      }
+      return;
+    }
+    
+    // 교육사이트 카테고리 처리
+    if (category === 'education') {
+      renderEducationSites();
+      return;
+    }
+
+    // 역량강화 카테고리 처리
+    if (category === 'capability') {
+      // tree 메뉴 확장
+      const treeItem = item.closest('.tree-item');
+      if (treeItem && treeItem.querySelector('.tree-menu')) {
+        treeItem.classList.add('open');
+      }
+      showCapabilityCards();
+      return;
+    }
+
+    // 통합 복무 카테고리 처리
+    if (category === 'works') {
+      const treeItem = item.closest('.tree-item');
+      if (treeItem && treeItem.querySelector('.tree-menu')) {
+        treeItem.classList.add('open');
+      }
+      showWorksCards();
+      return;
+    }
+
+    // 공통업무 카테고리 처리 (통합 복무 하위 메뉴)
+    if (category === 'shortcut') {
+      showShortcutCards();
+      return;
+    }
+
+    // 업무지원 카테고리 처리 (통합 복무 하위 메뉴)
+    if (category === 'worksupport') {
+      showWorkSupportCards();
+      return;
+    }
+
+    // Knowledge 카테고리 처리
+    if (category === 'knowledge') {
+      renderKnowledgeHome();
+      return;
+    }
+
+    // 기타 카테고리 클릭 시 기본 동작
     const chatMessages = document.getElementById('chatMessages');
     if (chatMessages) {
-      // 채팅 창 숨기기
-      chatMessages.style.display = 'none';
-      
-      // 공통업무일 경우 별도 welcome 카드 표시
-      if (category === 'shortcut') {
-        chatMessages.style.display = 'flex';
-        chatMessages.innerHTML = 
-          '<div class="welcome-card">' +
-            '<div class="welcome-icon"><i class="fa-solid fa-users"></i></div>' +
-            '<h2>공통 업무 시스템</h2>' +
-            '<p>공통 업무와 관련된 문의는 아래 버튼을 클릭하거나 직접 질문해 주세요.</p>' +
-            '<div class="quick-btns" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px;">' +
-              '<button class="quick-btn" data-msg="결재 시스템 알려줘"><i class="fa-solid fa-check-double"></i> 결재 시스템</button>' +
-              '<button class="quick-btn" data-msg="문서 관리 방법"><i class="fa-solid fa-file"></i> 문서 관리</button>' +
-              '<button class="quick-btn" data-msg="회의실 예약 방법"><i class="fa-solid fa-calendar-check"></i> 회의실 예약</button>' +
-              '<button class="quick-btn" data-msg="내부 연락처 문의"><i class="fa-solid fa-address-book"></i> 연락처</button>' +
-            '</div>' +
-            '<button class="quick-btn" onclick="location.reload()" style="margin-top: 16px; background: var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
-          '</div>';
-        bindQuickButtons();
-      }
+      chatMessages.style.display = 'flex';
     }
     return;
   }
-  
-  // 역량강화 카테고리 처리
-  if (category === 'capability') {
-    // chatMessages clear 후 역량강화 4 개 카드 표시
-    const chatMessages = document.getElementById("chatMessages");
-    if (chatMessages) {
-      chatMessages.innerHTML = 
-        '<div class="welcome-card" style="max-width: 800px; margin: 0 auto;">' +
-          '<div class="welcome-icon"><i class="fa-solid fa-graduation-cap"></i></div>' +
-          '<h2>역량강화 프로그램</h2>' +
-          '<p>KT DS 의 핵심 역량 강화 프로그램을 소개합니다.<br/>아래 4 가지 분야 중 관심 있는 분야를 선택해 주세요.</p>' +
-          '<div class="capability-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-top: 24px;">' +
-            '<div class="capability-card" data-capability="rap" style="background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.3s ease;">' +
-              '<div style="font-size: 48px; color: var(--kt-red); margin-bottom: 12px;"><i class="fa-solid fa-code"></i></div>' +
-              '<h3 style="margin: 0 0 8px 0; color: var(--text-primary);">RAP</h3>' +
-              '<p style="margin: 0; font-size: 13px; color: var(--text-secondary);">SAP RESTful Application Programming</p>' +
-            '</div>' +
-            '<div class="capability-card" data-capability="s4hana" style="background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.3s ease;">' +
-              '<div style="font-size: 48px; color: var(--kt-blue); margin-bottom: 12px;"><i class="fa-solid fa-database"></i></div>' +
-              '<h3 style="margin: 0 0 8px 0; color: var(--text-primary);">S/4HANA</h3>' +
-              '<p style="margin: 0; font-size: 13px; color: var(--text-secondary);">SAP S/4HANA 개발 및 운영</p>' +
-            '</div>' +
-            '<div class="capability-card" data-capability="btp" style="background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.3s ease;">' +
-              '<div style="font-size: 48px; color: var(--kt-green); margin-bottom: 12px;"><i class="fa-solid fa-cloud"></i></div>' +
-              '<h3 style="margin: 0 0 8px 0; color: var(--text-primary);">BTP</h3>' +
-              '<p style="margin: 0; font-size: 13px; color: var(--text-secondary);">SAP Business Technology Platform</p>' +
-            '</div>' +
-            '<div class="capability-card" data-capability="newabap" style="background: var(--bg-card); border: 2px solid var(--border-color); border-radius: 12px; padding: 24px; text-align: center; cursor: pointer; transition: all 0.3s ease;">' +
-              '<div style="font-size: 48px; color: var(--kt-orange); margin-bottom: 12px;"><i class="fa-solid fa-laptop-code"></i></div>' +
-              '<h3 style="margin: 0 0 8px 0; color: var(--text-primary);">NEW ABAP</h3>' +
-              '<p style="margin: 0; font-size: 13px; color: var(--text-secondary);">최신 ABAP 개발 기법</p>' +
-            '</div>' +
-          '</div>' +
-        '</div>';
-      
-      // 카드 클릭 이벤트 바인딩
-      document.querySelectorAll('.capability-card').forEach(card => {
-        card.addEventListener('click', function() {
-          const capability = this.dataset.capability;
-          let title = '';
-          let icon = '';
-          let color = '';
-          
-          if (capability === 'rap') {
-            title = 'RAP (RESTful Application Programming)';
-            icon = 'fa-code';
-            color = 'var(--kt-red)';
-          } else if (capability === 's4hana') {
-            title = 'S/4HANA';
-            icon = 'fa-database';
-            color = 'var(--kt-blue)';
-          } else if (capability === 'btp') {
-            title = 'BTP (Business Technology Platform)';
-            icon = 'fa-cloud';
-            color = 'var(--kt-green)';
-          } else if (capability === 'newabap') {
-            title = 'NEW ABAP';
-            icon = 'fa-laptop-code';
-            color = 'var(--kt-orange)';
-          }
-          
-          this.parentElement.parentElement.innerHTML = 
-            '<div class="welcome-card">' +
-              '<div class="welcome-icon"><i class="fa-solid ' + icon + '"></i></div>' +
-              '<h2 style="color: ' + color + ';">' + title + ' 프로그램</h2>' +
-              '<p><strong>' + title + '</strong>에 대한 자세한 정보를 안내해 드립니다.<br/>구체적인 질문을 입력해 주시면 더 자세히 안내해 드립니다.</p>' +
-              '<div class="quick-btns" style="display: flex; gap: 12px; flex-wrap: wrap; margin-top: 20px;">' +
-                '<button class="quick-btn" data-msg="' + title + ' 기초 교육 내용 알려줘"><i class="fa-solid fa-book"></i> 기초 교육</button>' +
-                '<button class="quick-btn" data-msg="' + title + ' 심화 과정 알려줘"><i class="fa-solid fa-layer-group"></i> 심화 과정</button>' +
-                '<button class="quick-btn" data-msg="' + title + ' 자격증 정보 알려줘"><i class="fa-solid fa-certificate"></i> 자격증</button>' +
-                '<button class="quick-btn" data-msg="' + title + ' 실무 프로젝트 사례"><i class="fa-solid fa-briefcase"></i> 실무 사례</button>' +
-              '</div>' +
-              '<button class="quick-btn" id="backToCapabilityList" style="margin-top: 16px; background: var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
-            '</div>';
-          
-          bindQuickButtons();
-          
-          // 목록으로 버튼 클릭 시 4 개 카드 복귀
-          const backBtn = document.getElementById('backToCapabilityList');
-          if (backBtn) {
-            backBtn.addEventListener('click', function() {
-              showCapabilityCards();
-            });
-          }
-        });
-      });
+
+  // 2. Tree 메뉴 토글 (역량강화 클릭 시 확장/축소) - 하위 메뉴가 아닌 경우만
+  const treeTitle = e.target.closest('.tree-title');
+  if (treeTitle) {
+    const treeItem = treeTitle.closest('.tree-item');
+    if (treeItem && treeItem.querySelector('.tree-menu')) {
+      treeItem.classList.toggle('open');
+      return;
     }
-    return;
   }
-  
-  // 지식모음(Knowledge) 카테고리 처리 — Dataset API 연동
-  if (category === 'knowledge') {
-    renderKnowledgeHome();
-    return;
-  }
-  
-  // 기타 카테고리 클릭 시 기본 동작
-  const chatMessages = document.getElementById('chatMessages');
-  if (chatMessages) {
-    chatMessages.style.display = 'flex';
-  }
-});
+  });
+})();
 
 // 역량강화 4 개 카드 표시 함수
 function showCapabilityCards() {
@@ -556,26 +699,105 @@ function showCapabilityCards() {
 
 // BJH 추가 end
 
+// 기본 Welcome Card 렌더링 (Knowledge, 교육사이트 등에서 목록으로 복귀 시 사용)
+function renderDefaultWelcomeCard() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-robot"></i></div>' +
+      '<h2>안녕하세요! STP AI Agent 입니다.</h2>' +
+      '<p><strong>SAP MM</strong> 및 <strong>KT DS STP</strong> 업무 관련 문의사항을 자유롭게 질문해 주세요.<br/>구매 프로세스, 자재 관리, 신설법인 프로세스, 계정/권한 등 다양한 업무를 지원합니다.<br/>STP AI 에이전트가 실시간으로 정확한 답변을 제공합니다.</p>' +
+      '<div class="quick-btns">' +
+        '<button class="quick-btn" data-msg="SAP MM(Material Management) 모듈에 대해 알려주세요"><i class="fa-solid fa-cubes"></i> SAP MM 모듈</button>' +
+        '<button class="quick-btn" data-msg="STP Table & T-code 알려주세요"><i class="fa-solid fa-table"></i> Table & T-code</button>' +
+        '<button class="quick-btn" data-msg="신설법인 (Netcore, P&M) 프로세스 알려주세요"><i class="fa-solid fa-building-circle-arrow-right"></i> 신설법인 프로세스</button>' +
+        '<button class="quick-btn" data-msg="STP에서 업무할 때 주로 사용하는 연계 시스템에 대해서 알려주세요"><i class="fa-solid fa-desktop"></i> 시스템</button>' +
+        '<button class="quick-btn" data-msg="MM RFC & 배치에 대해 알려주세요"><i class="fa-solid fa-network-wired"></i> MM RFC & 배치</button>' +
+        '<button class="quick-btn" data-msg="STP 운영 담당부서를 알려주세요"><i class="fa-solid fa-address-book"></i> 담당자 연락처</button>' +
+      '</div>' +
+    '</div>';
+
+  bindQuickButtons();
+}
+
+// 교육사이트 화면 렌더링 (3개 사이트 통합)
+function renderEducationSites() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-graduation-cap"></i></div>' +
+      '<h2>교육사이트</h2>' +
+      '<p>아래 교육사이트에서 다양한 교육 과정을 수강할 수 있습니다.</p>' +
+      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;">' +
+
+      // 1. 교육과정 신청
+      '<a href="https://hr.ktds.co.kr/" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(37,99,235,0.1);margin-bottom:12px;"><i class="fa-solid fa-clipboard-list" style="font-size:22px;color:var(--kt-blue);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">교육과정 신청</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">HR 포털에서 교육과정 신청</span>' +
+      '</a>' +
+
+      // 2. Udemy 교육
+      '<a href="https://ktds.udemy.com/organization/home/" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(226,0,42,0.1);margin-bottom:12px;"><i class="fa-solid fa-graduation-cap" style="font-size:22px;color:var(--kt-red);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">Udemy 교육</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">KT DS Udemy 교육 과정</span>' +
+      '</a>' +
+
+      // 3. KT학습플랫폼 지니어스
+      '<a href="https://ktedu.kt.com/main/portalMain.do" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(16,185,129,0.1);margin-bottom:12px;"><i class="fa-solid fa-laptop-code" style="font-size:22px;color:var(--kt-green);"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">KT학습플랫폼 지니어스</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">KT 그룹 학습 플랫폼</span>' +
+      '</a>' +
+
+      '</div>' +
+      '<button class="quick-btn" id="educationBackHome" style="margin-top:20px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+    '</div>';
+
+  const backBtn = document.getElementById('educationBackHome');
+  if (backBtn) backBtn.addEventListener('click', function() { renderDefaultWelcomeCard(); });
+}
+
 /* ============================================================
   KNOWLEDGE MODULE — Dataset API 연동
   ============================================================ */
 
-// Dataset API 호출 헬퍼 (직접 호출 - DIFY_API 패턴 동일)
+// Dataset API 호출 헬퍼 (DIFY_API 패턴 동일 - 직접 호출)
 async function datasetApiCall(path, options = {}) {
   const url = DATASET_API.baseUrl + path;
-  const res = await fetch(url, {
-    headers: {
-      'Authorization': 'Bearer ' + DATASET_API.apiKey,
-      'Content-Type': 'application/json'
-    },
-    ...options
-  });
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error('Dataset API ' + res.status + ': ' + errText);
+  
+  try {
+    const res = await fetch(url, {
+      ...options,
+      headers: {
+        'Authorization': 'Bearer ' + DATASET_API.apiKey,
+        'Content-Type': 'application/json',
+        ...(options.headers || {})
+      }
+    });
+    
+    if (!res.ok) {
+      const errText = await res.text();
+      throw new Error('Dataset API ' + res.status + ': ' + errText);
+    }
+    return res.json();
+  } catch (err) {
+    if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
+      console.error('[CORS Error] 요청이 차단되었습니다. URL:', url);
+      throw new Error('CORS 차단으로 인해 요청이 실패했습니다.\n\n해결 방법:\n1. 브라우저 CORS 확장 프로그램 설치 (권장)\n2. 백엔드 프록시 사용 (node server.js)\n3. Dify 서버 CORS 설정 변경');
+    }
+    throw err;
   }
-  return res.json();
 }
+
+// ============================================================
+// Dataset API 연동 함수들
+// ============================================================
 
 // 지식 목록 조회 (GET /datasets)
 async function fetchKnowledgeList() {
@@ -600,7 +822,7 @@ async function fetchKnowledgeSearch(query) {
   return data;
 }
 
-// 지식 생성 (POST /api/knowledge/datasets via proxy)
+// 지식 생성 (POST /datasets)
 async function createKnowledge(name, description) {
   const data = await datasetApiCall('/datasets', {
     method: 'POST',
@@ -624,6 +846,84 @@ async function createKnowledge(name, description) {
   return data;
 }
 
+// 지식 삭제 (DELETE /datasets/{dataset_id})
+async function deleteKnowledge(datasetId) {
+  const data = await datasetApiCall('/datasets/' + datasetId, {
+    method: 'DELETE'
+  });
+  return data;
+}
+
+// 검색 설정 수정 (PATCH /datasets/{dataset_id}/retrieval-model)
+async function updateRetrievalModel(datasetId, retrievalModel) {
+  const data = await datasetApiCall('/datasets/' + datasetId + '/retrieval-model', {
+    method: 'PATCH',
+    body: JSON.stringify(retrievalModel)
+  });
+  return data;
+}
+
+// 문서 목록 조회 (GET /datasets/{dataset_id}/documents)
+async function fetchDocumentList(datasetId) {
+  const data = await datasetApiCall('/datasets/' + datasetId + '/documents');
+  return data.data || data.documents || [];
+}
+
+// 텍스트로 문서 생성 (POST /datasets/{dataset_id}/document/create_by_text)
+async function createDocumentByText(datasetId, name, text) {
+  const data = await datasetApiCall('/datasets/' + datasetId + '/document/create_by_text', {
+    method: 'POST',
+    body: JSON.stringify({
+      name: name,
+      text: text
+    })
+  });
+  return data;
+}
+
+// 문서 삭제 (DELETE /datasets/{dataset_id}/documents/{document_id})
+async function deleteDocument(datasetId, documentId) {
+  const data = await datasetApiCall('/datasets/' + datasetId + '/documents/' + documentId, {
+    method: 'DELETE'
+  });
+  return data;
+}
+
+// 청크 목록 조회 (GET /datasets/{dataset_id}/documents/{document_id}/segments)
+async function fetchSegmentList(datasetId, documentId) {
+  const data = await datasetApiCall('/datasets/' + datasetId + '/documents/' + documentId + '/segments');
+  return data.data || data.segments || [];
+}
+
+// 청크 생성 (POST /datasets/{dataset_id}/documents/{document_id}/segments)
+async function createSegment(datasetId, documentId, content) {
+  const data = await datasetApiCall('/datasets/' + datasetId + '/documents/' + documentId + '/segments', {
+    method: 'POST',
+    body: JSON.stringify({
+      content: content
+    })
+  });
+  return data;
+}
+
+// 청크 삭제 (DELETE /datasets/{dataset_id}/documents/{document_id}/segments/{segment_id})
+async function deleteSegment(datasetId, documentId, segmentId) {
+  const data = await datasetApiCall('/datasets/' + datasetId + '/documents/' + documentId + '/segments/' + segmentId, {
+    method: 'DELETE'
+  });
+  return data;
+}
+
+// 인덱싱 상태 조회 (GET /datasets/{dataset_id}/documents/{batch}/indexing-status)
+async function fetchIndexingStatus(datasetId, batch) {
+  const data = await datasetApiCall('/datasets/' + datasetId + '/documents/' + batch + '/indexing-status');
+  return data;
+}
+
+// ============================================================
+// Knowledge UI 렌더링 함수들
+// ============================================================
+
 // Knowledge 홈 화면 렌더링
 function renderKnowledgeHome() {
   const chatMessages = document.getElementById('chatMessages');
@@ -631,9 +931,16 @@ function renderKnowledgeHome() {
 
   chatMessages.innerHTML =
     '<div class="welcome-card" style="max-width:900px;margin:0 auto;">' +
-      '<div class="welcome-icon"><i class="fa-solid fa-brain"></i></div>' +
-      '<h2>STP AI Knowledge</h2>' +
+      '<div class="welcome-icon"><i class="fa-solid fa-lightbulb"></i></div>' +
+      '<h2>💡 STP AI Knowledge</h2>' +
       '<p>KT DS 특화 지식을 RAG + LLM 모델에 학습시켜 더 정확하고 유용한 답변을 제공합니다.<br/>아래에서 지식을 검색하거나 새로운 지식을 추가해 주세요.</p>' +
+      '<div style="background:linear-gradient(135deg, rgba(226,0,42,0.1), rgba(226,0,42,0.05));border:1px solid var(--kt-red);border-radius:12px;padding:20px;margin-top:20px;">' +
+        '<h3 style="margin:0 0 12px 0;color:var(--kt-red);"><i class="fa-solid fa-rocket"></i> AI 학습용 지식 추가하기</h3>' +
+        '<p style="margin:0 0 16px 0;font-size:14px;line-height:1.7;">STP AI가 더 똑똑해지도록 AI 학습용 지식을 추가해 주세요.<br/>아래 링크에서 KT DS 특화 지식을 등록하면 AI가 학습하여 더 정확한 답변을 제공합니다.</p>' +
+        '<a href="https://studio.abclab.ktds.com/dashboard/knowledge" target="_blank" rel="noopener noreferrer" style="display:inline-block;padding:12px 24px;background:var(--kt-red);color:#fff;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;transition:all 0.3s ease;box-shadow:0 4px 12px rgba(226,0,42,0.3);">' +
+          '<i class="fa-solid fa-external-link-alt"></i> Knowledge Studio 열기' +
+        '</a>' +
+      '</div>' +
       '<div class="knowledge-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;">' +
         '<button class="quick-btn" id="knowledgeSearchBtn" style="padding:16px;font-size:15px;">' +
           '<i class="fa-solid fa-magnifying-glass"></i> 지식 검색' +
@@ -783,10 +1090,23 @@ async function loadKnowledgeList() {
         '</div>' +
         (desc ? '<div style="font-size:13px;color:var(--text-secondary);margin-bottom:6px;">' + escapeHtml(desc) + '</div>' : '') +
         '<div style="font-size:11px;color:var(--text-secondary);">ID: ' + escapeHtml(id) + (created ? ' · 등록일: ' + created : '') + '</div>' +
+        '<div style="margin-top:10px;display:flex;gap:8px;">' +
+          '<button class="quick-btn knowledge-docs-btn" data-dataset-id="' + escapeHtml(id) + '" style="padding:6px 14px;font-size:12px;"><i class="fa-solid fa-file-lines"></i> 문서 보기</button>' +
+        '</div>' +
       '</div>';
     });
 
     resultsDiv.innerHTML = html;
+
+    // 문서 보기 버튼 바인딩
+    resultsDiv.querySelectorAll('.knowledge-docs-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const datasetId = this.dataset.datasetId;
+        loadDocumentList(datasetId);
+      });
+    });
+
+
   } catch (err) {
     const resultsDiv = document.getElementById('knowledgeListResults');
     resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 목록 조회 오류: ' + escapeHtml(err.message) + '</div>';
@@ -944,6 +1264,247 @@ async function executeKnowledgeSearchForUpdate(query) {
     });
   } catch (err) {
     resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 조회 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// ============================================================
+// Document API UI 함수들
+// ============================================================
+
+// 문서 목록 로드
+async function loadDocumentList(datasetId) {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-file-lines"></i></div>' +
+      '<h2>문서 목록</h2>' +
+      '<p>지식(Dataset) 에 등록된 문서 목록입니다.</p>' +
+      '<div id="documentListResults" style="margin-top:20px;text-align:left;">' +
+        '<div style="text-align:center;padding:20px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">로딩 중...</span></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;margin-top:16px;">' +
+        '<button class="quick-btn" id="documentCreateBtn" style="padding:12px 24px;"><i class="fa-solid fa-plus"></i> 문서 추가</button>' +
+        '<button class="quick-btn" id="documentBackBtn" style="padding:12px 24px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('documentBackBtn').addEventListener('click', function() { loadKnowledgeList(); });
+  document.getElementById('documentCreateBtn').addEventListener('click', function() { renderDocumentCreate(datasetId); });
+
+  try {
+    const documents = await fetchDocumentList(datasetId);
+    const resultsDiv = document.getElementById('documentListResults');
+
+    if (!documents || documents.length === 0) {
+      resultsDiv.innerHTML = '<div style="text-align:center;padding:30px;background:var(--bg-secondary);border-radius:12px;"><i class="fa-solid fa-folder-open" style="font-size:36px;color:var(--text-secondary);margin-bottom:12px;"></i><br/><strong>등록된 문서가 없습니다</strong><br/><span style="font-size:13px;color:var(--text-secondary);">새로운 문서를 추가해 주세요.</span></div>';
+      return;
+    }
+
+    let html = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;"><i class="fa-solid fa-check-circle" style="color:var(--kt-green);"></i> ' + documents.length + ' 개의 문서가 등록되어 있습니다.</div>';
+
+    documents.forEach(function(doc, i) {
+      const name = doc.name || '제목 없음';
+      const id = doc.id || '';
+      const status = doc.indexing_status || doc.status || '';
+      const created = doc.created_at ? new Date(doc.created_at * 1000).toLocaleDateString('ko-KR') : '';
+
+      html += '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:16px;margin-bottom:12px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+          '<strong style="color:var(--kt-red);"><i class="fa-solid fa-file-lines"></i> ' + escapeHtml(name) + '</strong>' +
+          '<span style="font-size:11px;color:var(--text-secondary);">' + escapeHtml(status) + '</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text-secondary);">ID: ' + escapeHtml(id) + (created ? ' · 등록일: ' + created : '') + '</div>' +
+        '<div style="margin-top:10px;display:flex;gap:8px;">' +
+          '<button class="quick-btn document-segments-btn" data-dataset-id="' + escapeHtml(datasetId) + '" data-document-id="' + escapeHtml(id) + '" style="padding:6px 14px;font-size:12px;"><i class="fa-solid fa-layer-group"></i> 청크 보기</button>' +
+        '</div>' +
+      '</div>';
+    });
+
+    resultsDiv.innerHTML = html;
+
+    // 청크 보기 버튼 바인딩
+    resultsDiv.querySelectorAll('.document-segments-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const dsId = this.dataset.datasetId;
+        const docId = this.dataset.documentId;
+        loadSegmentList(dsId, docId);
+      });
+    });
+
+
+  } catch (err) {
+    const resultsDiv = document.getElementById('documentListResults');
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 목록 조회 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// 문서 생성 화면
+function renderDocumentCreate(datasetId) {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:700px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-plus-circle"></i></div>' +
+      '<h2>새 문서 추가</h2>' +
+      '<p>텍스트로 새로운 문서를 생성해 지식(Dataset) 에 추가해 주세요.</p>' +
+      '<div style="margin-top:20px;">' +
+        '<label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:var(--text-primary);">문서 이름 *</label>' +
+        '<input type="text" id="documentNameInput" placeholder="예: STP 구매 프로세스 가이드" style="width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-primary);box-sizing:border-box;margin-bottom:16px;"/>' +
+        '<label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:var(--text-primary);">문서 내용 *</label>' +
+        '<textarea id="documentTextInput" placeholder="문서 내용을 입력하세요..." rows="10" style="width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-primary);box-sizing:border-box;resize:vertical;margin-bottom:20px;"></textarea>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;">' +
+        '<button class="quick-btn" id="documentCreateGoBtn" style="padding:12px 24px;"><i class="fa-solid fa-plus"></i> 생성하기</button>' +
+        '<button class="quick-btn" id="documentBackBtn" style="padding:12px 24px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 취소</button>' +
+      '</div>' +
+      '<div id="documentCreateResult" style="margin-top:16px;"></div>' +
+    '</div>';
+
+  document.getElementById('documentCreateGoBtn').addEventListener('click', function() {
+    const name = document.getElementById('documentNameInput').value.trim();
+    const text = document.getElementById('documentTextInput').value.trim();
+    if (!name || !text) {
+      document.getElementById('documentCreateResult').innerHTML = '<div style="color:var(--kt-red);font-size:13px;"><i class="fa-solid fa-circle-exclamation"></i> 문서 이름과 내용을 입력해 주세요.</div>';
+      return;
+    }
+    executeDocumentCreate(datasetId, name, text);
+  });
+
+  document.getElementById('documentBackBtn').addEventListener('click', function() { loadDocumentList(datasetId); });
+  document.getElementById('documentNameInput').focus();
+}
+
+// 문서 생성 실행
+async function executeDocumentCreate(datasetId, name, text) {
+  const resultDiv = document.getElementById('documentCreateResult');
+  resultDiv.innerHTML = '<div style="text-align:center;padding:16px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:20px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">생성 중...</span></div>';
+
+  try {
+    const data = await createDocumentByText(datasetId, name, text);
+    const id = data.id || data.document_id || '';
+    resultDiv.innerHTML =
+      '<div style="background:var(--bg-card);border:1px solid var(--kt-green);border-radius:10px;padding:16px;text-align:center;">' +
+        '<i class="fa-solid fa-circle-check" style="font-size:28px;color:var(--kt-green);margin-bottom:8px;"></i><br/>' +
+        '<strong style="color:var(--kt-green);">문서 생성 완료!</strong><br/>' +
+        '<span style="font-size:13px;color:var(--text-secondary);">ID: ' + escapeHtml(id) + '</span>' +
+      '</div>';
+  } catch (err) {
+    resultDiv.innerHTML = '<div style="color:var(--kt-red);font-size:13px;"><i class="fa-solid fa-triangle-exclamation"></i> 생성 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// ============================================================
+// Segment API UI 함수들
+// ============================================================
+
+// 청크 목록 로드
+async function loadSegmentList(datasetId, documentId) {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-layer-group"></i></div>' +
+      '<h2>청크 목록</h2>' +
+      '<p>문서에 등록된 청크(Segment) 목록입니다.</p>' +
+      '<div id="segmentListResults" style="margin-top:20px;text-align:left;">' +
+        '<div style="text-align:center;padding:20px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">로딩 중...</span></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;margin-top:16px;">' +
+        '<button class="quick-btn" id="segmentCreateBtn" style="padding:12px 24px;"><i class="fa-solid fa-plus"></i> 청크 추가</button>' +
+        '<button class="quick-btn" id="segmentBackBtn" style="padding:12px 24px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 목록으로</button>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('segmentBackBtn').addEventListener('click', function() { loadDocumentList(datasetId); });
+  document.getElementById('segmentCreateBtn').addEventListener('click', function() { renderSegmentCreate(datasetId, documentId); });
+
+  try {
+    const segments = await fetchSegmentList(datasetId, documentId);
+    const resultsDiv = document.getElementById('segmentListResults');
+
+    if (!segments || segments.length === 0) {
+      resultsDiv.innerHTML = '<div style="text-align:center;padding:30px;background:var(--bg-secondary);border-radius:12px;"><i class="fa-solid fa-folder-open" style="font-size:36px;color:var(--text-secondary);margin-bottom:12px;"></i><br/><strong>등록된 청크가 없습니다</strong><br/><span style="font-size:13px;color:var(--text-secondary);">새로운 청크를 추가해 주세요.</span></div>';
+      return;
+    }
+
+    let html = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;"><i class="fa-solid fa-check-circle" style="color:var(--kt-green);"></i> ' + segments.length + ' 개의 청크가 등록되어 있습니다.</div>';
+
+    segments.forEach(function(seg, i) {
+      const content = seg.content || seg.text || '내용 없음';
+      const id = seg.id || '';
+
+      html += '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:16px;margin-bottom:12px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+          '<strong style="color:var(--kt-red);"><i class="fa-solid fa-layer-group"></i> 청크 #' + (i + 1) + '</strong>' +
+          '<span style="font-size:11px;color:var(--text-secondary);">ID: ' + escapeHtml(id) + '</span>' +
+        '</div>' +
+        '<div style="font-size:13px;line-height:1.7;color:var(--text-primary);white-space:pre-wrap;">' + escapeHtml(content).substring(0, 500) + '</div>' +
+      '</div>';
+    });
+
+    resultsDiv.innerHTML = html;
+
+
+  } catch (err) {
+    const resultsDiv = document.getElementById('segmentListResults');
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 목록 조회 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// 청크 생성 화면
+function renderSegmentCreate(datasetId, documentId) {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:700px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-plus-circle"></i></div>' +
+      '<h2>새 청크 추가</h2>' +
+      '<p>텍스트로 새로운 청크(Segment)를 생성해 문서에 추가해 주세요.</p>' +
+      '<div style="margin-top:20px;">' +
+        '<label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:var(--text-primary);">청크 내용 *</label>' +
+        '<textarea id="segmentTextInput" placeholder="청크 내용을 입력하세요..." rows="8" style="width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-primary);box-sizing:border-box;resize:vertical;margin-bottom:20px;"></textarea>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;">' +
+        '<button class="quick-btn" id="segmentCreateGoBtn" style="padding:12px 24px;"><i class="fa-solid fa-plus"></i> 생성하기</button>' +
+        '<button class="quick-btn" id="segmentBackBtn" style="padding:12px 24px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 취소</button>' +
+      '</div>' +
+      '<div id="segmentCreateResult" style="margin-top:16px;"></div>' +
+    '</div>';
+
+  document.getElementById('segmentCreateGoBtn').addEventListener('click', function() {
+    const text = document.getElementById('segmentTextInput').value.trim();
+    if (!text) {
+      document.getElementById('segmentCreateResult').innerHTML = '<div style="color:var(--kt-red);font-size:13px;"><i class="fa-solid fa-circle-exclamation"></i> 청크 내용을 입력해 주세요.</div>';
+      return;
+    }
+    executeSegmentCreate(datasetId, documentId, text);
+  });
+
+  document.getElementById('segmentBackBtn').addEventListener('click', function() { loadSegmentList(datasetId, documentId); });
+  document.getElementById('segmentTextInput').focus();
+}
+
+// 청크 생성 실행
+async function executeSegmentCreate(datasetId, documentId, text) {
+  const resultDiv = document.getElementById('segmentCreateResult');
+  resultDiv.innerHTML = '<div style="text-align:center;padding:16px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:20px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">생성 중...</span></div>';
+
+  try {
+    const data = await createSegment(datasetId, documentId, text);
+    const id = data.id || data.segment_id || '';
+    resultDiv.innerHTML =
+      '<div style="background:var(--bg-card);border:1px solid var(--kt-green);border-radius:10px;padding:16px;text-align:center;">' +
+        '<i class="fa-solid fa-circle-check" style="font-size:28px;color:var(--kt-green);margin-bottom:8px;"></i><br/>' +
+        '<strong style="color:var(--kt-green);">청크 생성 완료!</strong><br/>' +
+        '<span style="font-size:13px;color:var(--text-secondary);">ID: ' + escapeHtml(id) + '</span>' +
+      '</div>';
+  } catch (err) {
+    resultDiv.innerHTML = '<div style="color:var(--kt-red);font-size:13px;"><i class="fa-solid fa-triangle-exclamation"></i> 생성 오류: ' + escapeHtml(err.message) + '</div>';
   }
 }
 
@@ -2424,6 +2985,12 @@ document.querySelectorAll('.category-item').forEach(function(item) {
                   <i class="fa-solid fa-umbrella-beach"></i> 휴가 신청</button>
                 <button onclick="openPage('businesstrip')" class="quick-btn">
                   <i class="fa-solid fa-plane-departure"></i> 출장 신청</button>
+                <button onclick="openPage('smartwork')" class="quick-btn">
+                  <i class="fa-solid fa-computer"></i> 스마트워크 예약</button>
+                <button onclick="openPage('meeting')" class="quick-btn">
+                  <i class="fa-solid fa-people-group + fa-door-open"></i> 회의실 예약</button>
+                <button onclick="openPage('market')" class="quick-btn">
+                  <i class="fa-solid fa-hand-holding-heart"></i> ds 나눔장터</button>
               </div>
             </div>
             `;
