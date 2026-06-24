@@ -168,6 +168,9 @@ function openPage(type) {
     case 'kms':
       window.open('https://ktds-kms.atlassian.net/wiki/spaces/ERP/pages/159359809/MM', '_blank');
       break;
+    case 'tms':
+      window.open('https://tms.ktds.co.kr/tms/tm/tma002.run', '_blank');
+      break;
     case 'tms_team':
       window.open('https://gdrive.kt.co.kr/link/EOQwRhmq4Uy6mqJxsPy-IQ?ccd=1014', '_blank');
       break;
