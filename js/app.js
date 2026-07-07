@@ -18,8 +18,8 @@ const DIFY_API = {
     ============================================================ */
 const DATASET_API = {
   baseUrl    : 'https://api.abclab.ktds.com/v1',
-  apiKey     : 'dataset-fOGqbX2rbavh2a5nQ6TXUGiQ',
-  datasetId  : 'fOGqbX2rbavh2a5nQ6TXUGiQ'
+  apiKey     : 'dataset-A6SndVab2SRIcXyrXubLVLGn',
+  datasetId  : '4249e8e0-d1cf-49c7-a371-d4ab9194c718'
 };
 
 /* ============================================================
@@ -99,14 +99,14 @@ const KEYWORD_MAP = {
   account : ['계정','비밀번호','패스워드','권한','로그인','잠금','인증','account','접근','승인'],
   network : ['네트워크','vpn','ip','dns','방화벽','포트','연결','ping','접속','통신','network'],
   deploy  : ['mm 연동','연동','배치','material management','자재 연동','구매 연동','입고 연동','출고 연동','MIGO','MIRO','ME21','ME22','ME23','자재 마스터','物料管理','配着','J-FLOW'],
-  security: ['담당자','연락처','담당부서','운영 담당','운영담당','담당자 연락','책임자','KT ALPHA','alpha 담당자','alpha 담당','알파 담당자','알파 담당']
+  security: ['담당자','KT ALPHA','alpha 담당자','alpha 담당','알파 담당자','알파 담당']
 };
 
 function detectCategory(text) {
   const lower = text.toLowerCase();
   
   // 담당자/연락처 키워드가 포함되면 무조건 security 카테고리로 우선 처리
-  const contactKeywords = ['담당자','연락처','담당부서','운영 담당','운영담당','담당자 연락','책임자','담당자'];
+  const contactKeywords = ['담당자'];
   if (contactKeywords.some(function(kw) { return lower.includes(kw); })) {
     return 'security';
   }
@@ -410,23 +410,30 @@ function showShortcutCards() {
       '<div class="welcome-icon"><i class="fa-solid fa-users"></i></div>' +
       '<h2>공통 업무</h2>' +
       '<p>팀 공통 업무 관련 링크를 제공합니다.</p>' +
-      '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:24px;">' +
+      '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:24px;">' +
 
-      // 주간 보고
-      '<a href="https://ktds-kms.atlassian.net/wiki/spaces/ERPX/pages/253081942/STP" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+       // 주간 보고
+       '<a href="https://ktds-kms.atlassian.net/wiki/spaces/ERPX/pages/253081942/STP" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
         '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(226,0,42,0.1);margin-bottom:12px;"><i class="fa-solid fa-users-viewfinder" style="font-size:22px;color:var(--kt-red);"></i></div>' +
         '<strong style="font-size:14px;margin-bottom:4px;">주간 보고</strong>' +
         '<span style="font-size:12px;color:var(--text-secondary);">주간 업무 보고</span>' +
       '</a>' +
 
-      // MM 산출물
-      '<a href="https://ktds-kms.atlassian.net/wiki/spaces/ERP/pages/159359809/MM" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+       // MM 산출물
+       '<a href="https://ktds-kms.atlassian.net/wiki/spaces/ERP/pages/159359809/MM" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
         '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(37,99,235,0.1);margin-bottom:12px;"><i class="fa-solid fa-folder-open" style="font-size:22px;color:var(--kt-blue);"></i></div>' +
         '<strong style="font-size:14px;margin-bottom:4px;">MM 산출물</strong>' +
         '<span style="font-size:12px;color:var(--text-secondary);">계약/구매/물류 산출물</span>' +
       '</a>' +
 
-      // TMS
+       // I/F정의서
+       '<a href="https://ktds-kms.atlassian.net/wiki/spaces/ERP/pages/159405193/MM" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(99,102,241,0.1);margin-bottom:12px;"><i class="fa-solid fa-file-contract" style="font-size:22px;color:#6366f1;"></i></div>' +
+        '<strong style="font-size:14px;margin-bottom:4px;">I/F정의서</strong>' +
+        '<span style="font-size:12px;color:var(--text-secondary);">MM I/F 정의서</span>' +
+      '</a>' +
+
+       // TMS
       '<a href="https://tms.ktds.co.kr/tms/tm/tma002.run" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
         '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(16,185,129,0.1);margin-bottom:12px;"><i class="fa-solid fa-share-nodes" style="font-size:22px;color:#3b82f6;"></i></div>' +
         '<strong style="font-size:14px;margin-bottom:4px;">TMS</strong>' +
@@ -779,13 +786,15 @@ function renderEducationSites() {
 
 // Dataset API 호출 헬퍼 (DIFY_API 패턴 동일 - 직접 호출)
 async function datasetApiCall(path, options = {}) {
-  const url = DATASET_API.baseUrl + path;
+  // 백엔드 프록시 URL (현재 도메인/포트 사용)
+  const proxyUrl = window.location.origin + '/api/knowledge' + path;
+  const directUrl = DATASET_API.baseUrl + path;
   
   try {
-    const res = await fetch(url, {
+    // 1차: 백엔드 프록시 시도
+    const res = await fetch(proxyUrl, {
       ...options,
       headers: {
-        'Authorization': 'Bearer ' + DATASET_API.apiKey,
         'Content-Type': 'application/json',
         ...(options.headers || {})
       }
@@ -796,12 +805,28 @@ async function datasetApiCall(path, options = {}) {
       throw new Error('Dataset API ' + res.status + ': ' + errText);
     }
     return res.json();
-  } catch (err) {
-    if (err.message === 'Failed to fetch' || err.name === 'TypeError') {
-      console.error('[CORS Error] 요청이 차단되었습니다. URL:', url);
-      throw new Error('CORS 차단으로 인해 요청이 실패했습니다.\n\n해결 방법:\n1. 브라우저 CORS 확장 프로그램 설치 (권장)\n2. 백엔드 프록시 사용 (node server.js)\n3. Dify 서버 CORS 설정 변경');
+  } catch (proxyErr) {
+    // 2차: 프록시 실패 시 직접 호출 시도 (CORS 허용 시)
+    try {
+      const res = await fetch(directUrl, {
+        ...options,
+        headers: {
+          'Authorization': 'Bearer ' + DATASET_API.apiKey,
+          'User-Agent': 'STP-AI-Agent/1.0',
+          'Content-Type': 'application/json',
+          ...(options.headers || {})
+        }
+      });
+      
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error('Dataset API ' + res.status + ': ' + errText);
+      }
+      return res.json();
+    } catch (directErr) {
+      // 둘 다 실패하면 프록시 오류 반환 (더 유용한 정보)
+      throw proxyErr;
     }
-    throw err;
   }
 }
 
@@ -815,17 +840,23 @@ async function fetchKnowledgeList() {
   return data.data || data.datasets || [];
 }
 
-// 지식 검색 (POST /datasets/{dataset_id}/retrieve)
+// 지식 검색 (POST /datasets/retrieve) - ABCLab Knowledge API
 async function fetchKnowledgeSearch(query) {
-  const data = await datasetApiCall('/datasets/' + DATASET_API.datasetId + '/retrieve', {
+  const data = await datasetApiCall('/datasets/retrieve', {
     method: 'POST',
     body: JSON.stringify({
+      dataset_id: DATASET_API.datasetId,
       query: query,
       retrieval_model: {
         search_method: 'hybrid_search',
-        reranking_enable: false,
+        reranking_enable: true,
+        reranking_model: {
+          reranking_provider_name: 'abclab',
+          reranking_model_name: 'BAAI/bge-reranker-v2-m3'
+        },
         top_k: 10,
-        score_threshold_enabled: false
+        score_threshold_enabled: true,
+        score_threshold: 0.7
       }
     })
   });
@@ -841,12 +872,7 @@ async function createKnowledge(name, description) {
       description: description || '',
       permission: 'all_team_members',
       retrieval_model: {
-        search_method: 'hybrid_search',
-        reranking_enable: true,
-        reranking_model: {
-          reranking_provider_name: 'cohere',
-          reranking_model_name: 'rerank-multilingual-v3'
-        },
+        search_method: 'semantic_search',
         top_k: 15,
         score_threshold_enabled: true,
         score_threshold: 0.7
@@ -885,7 +911,11 @@ async function createDocumentByText(datasetId, name, text) {
     method: 'POST',
     body: JSON.stringify({
       name: name,
-      text: text
+      text: text,
+      indexing_technique: 'high_quality',
+      process_rule: {
+        mode: 'automatic'
+      }
     })
   });
   return data;
@@ -964,6 +994,9 @@ function renderKnowledgeHome() {
         '<button class="quick-btn" id="knowledgeUpdateBtn" style="padding:16px;font-size:15px;">' +
           '<i class="fa-solid fa-pen-to-square"></i> 지식 수정' +
         '</button>' +
+        '<button class="quick-btn" id="knowledgeStpAiBtn" style="padding:16px;font-size:15px;grid-column:1 / -1;background:linear-gradient(135deg, var(--kt-red), #c2185b);color:#fff;">' +
+          '<i class="fa-solid fa-brain"></i> STP AI Knowledge' +
+        '</button>' +
       '</div>' +
     '</div>';
 
@@ -979,6 +1012,262 @@ function renderKnowledgeHome() {
 
   const updateBtn = document.getElementById('knowledgeUpdateBtn');
   if (updateBtn) updateBtn.addEventListener('click', function() { renderKnowledgeUpdate(); });
+
+  const stpAiBtn = document.getElementById('knowledgeStpAiBtn');
+  if (stpAiBtn) stpAiBtn.addEventListener('click', function() { loadStpAiKnowledge(); });
+}
+
+// ============================================================
+// STP AI Knowledge - STP AI Dataset 문서 관리
+// ============================================================
+
+// STP AI Knowledge 홈 화면
+function renderStpAiKnowledgeHome() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon" style="background:linear-gradient(135deg, var(--kt-red), #c2185b);"><i class="fa-solid fa-brain"></i></div>' +
+      '<h2>🧠 STP AI Knowledge</h2>' +
+      '<p>STP AI가 학습하는 지식(Dataset)을 직접 관리할 수 있습니다.<br/>문서를 추가하거나 수정하면 AI가 더 정확한 답변을 제공합니다.</p>' +
+      '<div style="background:linear-gradient(135deg, rgba(226,0,42,0.1), rgba(194,24,91,0.05));border:1px solid var(--kt-red);border-radius:12px;padding:16px;margin-top:16px;">' +
+        '<div style="display:flex;align-items:center;gap:10px;">' +
+          '<i class="fa-solid fa-database" style="font-size:24px;color:var(--kt-red);"></i>' +
+          '<div>' +
+            '<strong style="color:var(--text-primary);">STP AI Dataset</strong><br/>' +
+            '<span style="font-size:12px;color:var(--text-secondary);">ID: ' + DATASET_API.datasetId + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:20px;">' +
+        '<button class="quick-btn" id="stpAiDocListBtn" style="padding:16px;font-size:15px;">' +
+          '<i class="fa-solid fa-file-lines"></i> 문서 목록' +
+        '</button>' +
+        '<button class="quick-btn" id="stpAiDocCreateBtn" style="padding:16px;font-size:15px;">' +
+          '<i class="fa-solid fa-plus-circle"></i> 문서 추가' +
+        '</button>' +
+        '<button class="quick-btn" id="stpAiSearchBtn" style="padding:16px;font-size:15px;grid-column:1 / -1;">' +
+          '<i class="fa-solid fa-magnifying-glass"></i> 지식 검색' +
+        '</button>' +
+      '</div>' +
+      '<button class="quick-btn" id="knowledgeBackHome" style="margin-top:16px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> Knowledge 홈으로</button>' +
+    '</div>';
+
+  document.getElementById('stpAiDocListBtn').addEventListener('click', function() {
+    loadDocumentListForStpAi();
+  });
+  document.getElementById('stpAiDocCreateBtn').addEventListener('click', function() {
+    renderDocumentCreateForStpAi();
+  });
+  document.getElementById('stpAiSearchBtn').addEventListener('click', function() {
+    renderKnowledgeSearch();
+  });
+  document.getElementById('knowledgeBackHome').addEventListener('click', function() {
+    renderKnowledgeHome();
+  });
+}
+
+// STP AI Knowledge 진입점
+function loadStpAiKnowledge() {
+  renderStpAiKnowledgeHome();
+}
+
+// STP AI Dataset 문서 목록 로드
+async function loadDocumentListForStpAi() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-file-lines"></i></div>' +
+      '<h2>📄 STP AI 문서 목록</h2>' +
+      '<p>STP AI Dataset 에 등록된 문서 목록입니다.</p>' +
+      '<div id="documentListResults" style="margin-top:20px;text-align:left;">' +
+        '<div style="text-align:center;padding:20px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">로딩 중...</span></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;margin-top:16px;">' +
+        '<button class="quick-btn" id="documentCreateBtn" style="padding:12px 24px;"><i class="fa-solid fa-plus"></i> 문서 추가</button>' +
+        '<button class="quick-btn" id="documentBackBtn" style="padding:12px 24px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> STP AI Knowledge</button>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('documentBackBtn').addEventListener('click', function() { renderStpAiKnowledgeHome(); });
+  document.getElementById('documentCreateBtn').addEventListener('click', function() { renderDocumentCreateForStpAi(); });
+
+  try {
+    const documents = await fetchDocumentList(DATASET_API.datasetId);
+    const resultsDiv = document.getElementById('documentListResults');
+
+    if (!documents || documents.length === 0) {
+      resultsDiv.innerHTML = '<div style="text-align:center;padding:30px;background:var(--bg-secondary);border-radius:12px;"><i class="fa-solid fa-folder-open" style="font-size:36px;color:var(--text-secondary);margin-bottom:12px;"></i><br/><strong>등록된 문서가 없습니다</strong><br/><span style="font-size:13px;color:var(--text-secondary);">새로운 문서를 추가해 주세요.</span></div>';
+      return;
+    }
+
+    let html = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;"><i class="fa-solid fa-check-circle" style="color:var(--kt-green);"></i> ' + documents.length + ' 개의 문서가 등록되어 있습니다.</div>';
+
+    documents.forEach(function(doc, i) {
+      const name = doc.name || '제목 없음';
+      const id = doc.id || '';
+      const status = doc.indexing_status || doc.status || '';
+      const created = doc.created_at ? new Date(doc.created_at * 1000).toLocaleDateString('ko-KR') : '';
+
+      html += '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:16px;margin-bottom:12px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">' +
+          '<strong style="color:var(--kt-red);"><i class="fa-solid fa-file-lines"></i> ' + escapeHtml(name) + '</strong>' +
+          '<span style="font-size:11px;color:var(--text-secondary);">' + escapeHtml(status) + '</span>' +
+        '</div>' +
+        '<div style="font-size:11px;color:var(--text-secondary);">ID: ' + escapeHtml(id) + (created ? ' · 등록일: ' + created : '') + '</div>' +
+        '<div style="margin-top:10px;display:flex;gap:8px;">' +
+          '<button class="quick-btn document-segments-btn" data-dataset-id="' + escapeHtml(DATASET_API.datasetId) + '" data-document-id="' + escapeHtml(id) + '" style="padding:6px 14px;font-size:12px;"><i class="fa-solid fa-layer-group"></i> 청크 보기</button>' +
+          '<button class="quick-btn document-delete-btn" data-dataset-id="' + escapeHtml(DATASET_API.datasetId) + '" data-document-id="' + escapeHtml(id) + '" style="padding:6px 14px;font-size:12px;background:var(--bg-secondary);"><i class="fa-solid fa-trash"></i> 삭제</button>' +
+        '</div>' +
+      '</div>';
+    });
+
+    resultsDiv.innerHTML = html;
+
+    // 청크 보기 버튼 바인딩
+    resultsDiv.querySelectorAll('.document-segments-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const dsId = this.dataset.datasetId;
+        const docId = this.dataset.documentId;
+        loadSegmentListForStpAi(dsId, docId);
+      });
+    });
+
+    // 문서 삭제 버튼 바인딩
+    resultsDiv.querySelectorAll('.document-delete-btn').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        const dsId = this.dataset.datasetId;
+        const docId = this.dataset.documentId;
+        executeDeleteDocumentForStpAi(dsId, docId);
+      });
+    });
+
+  } catch (err) {
+    const resultsDiv = document.getElementById('documentListResults');
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 목록 조회 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// STP AI Dataset 문서 생성 화면
+function renderDocumentCreateForStpAi() {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:700px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-plus-circle"></i></div>' +
+      '<h2>📝 STP AI 문서 추가</h2>' +
+      '<p>텍스트로 새로운 문서를 생성해 STP AI Dataset 에 추가해 주세요.</p>' +
+      '<div style="margin-top:20px;">' +
+        '<label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:var(--text-primary);">문서 이름 *</label>' +
+        '<input type="text" id="documentNameInput" placeholder="예: STP 구매 프로세스 가이드" style="width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-primary);box-sizing:border-box;margin-bottom:16px;"/>' +
+        '<label style="display:block;margin-bottom:6px;font-size:13px;font-weight:600;color:var(--text-primary);">문서 내용 *</label>' +
+        '<textarea id="documentTextInput" placeholder="문서 내용을 입력하세요..." rows="10" style="width:100%;padding:12px 16px;border:1px solid var(--border-color);border-radius:8px;font-size:14px;background:var(--bg-card);color:var(--text-primary);box-sizing:border-box;resize:vertical;margin-bottom:20px;"></textarea>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;">' +
+        '<button class="quick-btn" id="documentCreateGoBtn" style="padding:12px 24px;"><i class="fa-solid fa-plus"></i> 생성하기</button>' +
+        '<button class="quick-btn" id="documentBackBtn" style="padding:12px 24px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 취소</button>' +
+      '</div>' +
+      '<div id="documentCreateResult" style="margin-top:16px;"></div>' +
+    '</div>';
+
+  document.getElementById('documentCreateGoBtn').addEventListener('click', function() {
+    const name = document.getElementById('documentNameInput').value.trim();
+    const text = document.getElementById('documentTextInput').value.trim();
+    if (!name || !text) {
+      document.getElementById('documentCreateResult').innerHTML = '<div style="color:var(--kt-red);font-size:13px;"><i class="fa-solid fa-circle-exclamation"></i> 문서 이름과 내용을 입력해 주세요.</div>';
+      return;
+    }
+    executeDocumentCreateForStpAi(name, text);
+  });
+
+  document.getElementById('documentBackBtn').addEventListener('click', function() { loadDocumentListForStpAi(); });
+  document.getElementById('documentNameInput').focus();
+}
+
+// STP AI Dataset 문서 생성 실행
+async function executeDocumentCreateForStpAi(name, text) {
+  const resultDiv = document.getElementById('documentCreateResult');
+  resultDiv.innerHTML = '<div style="text-align:center;padding:16px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:20px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">생성 중...</span></div>';
+
+  try {
+    const data = await createDocumentByText(DATASET_API.datasetId, name, text);
+    const id = data.id || data.document_id || '';
+    resultDiv.innerHTML = '<div style="text-align:center;padding:16px;background:rgba(16,185,129,0.1);border-radius:8px;color:var(--kt-green);"><i class="fa-solid fa-check-circle"></i> 문서가 성공적으로 생성되었습니다!<br/><span style="font-size:12px;">ID: ' + escapeHtml(id) + '</span></div>';
+
+    setTimeout(function() {
+      loadDocumentListForStpAi();
+    }, 1500);
+  } catch (err) {
+    resultDiv.innerHTML = '<div style="text-align:center;padding:16px;background:var(--bg-secondary);border-radius:8px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 생성 오류: ' + escapeHtml(err.message) + '</div>';
+  }
+}
+
+// STP AI Dataset 문서 삭제 실행
+async function executeDeleteDocumentForStpAi(datasetId, documentId) {
+  if (!confirm('정말 이 문서를 삭제하시겠습니까?')) return;
+
+  try {
+    await deleteDocument(datasetId, documentId);
+    showToast('문서가 성공적으로 삭제되었습니다.', 'success');
+    loadDocumentListForStpAi();
+  } catch (err) {
+    showToast('삭제 오류: ' + err.message, 'error');
+  }
+}
+
+// STP AI Dataset 청크 목록 로드
+async function loadSegmentListForStpAi(datasetId, documentId) {
+  const chatMessages = document.getElementById('chatMessages');
+  if (!chatMessages) return;
+
+  chatMessages.innerHTML =
+    '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
+      '<div class="welcome-icon"><i class="fa-solid fa-layer-group"></i></div>' +
+      '<h2>📦 청크 목록</h2>' +
+      '<p>문서의 청크(Segment) 목록입니다.</p>' +
+      '<div id="segmentListResults" style="margin-top:20px;text-align:left;">' +
+        '<div style="text-align:center;padding:20px;"><i class="fa-solid fa-spinner fa-spin" style="font-size:24px;color:var(--kt-red);"></i><br/><span style="color:var(--text-secondary);">로딩 중...</span></div>' +
+      '</div>' +
+      '<div style="display:flex;gap:10px;margin-top:16px;">' +
+        '<button class="quick-btn" id="segmentBackBtn" style="padding:12px 24px;background:var(--bg-secondary);"><i class="fa-solid fa-arrow-left"></i> 문서 목록으로</button>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('segmentBackBtn').addEventListener('click', function() { loadDocumentListForStpAi(); });
+
+  try {
+    const segments = await fetchSegmentList(datasetId, documentId);
+    const resultsDiv = document.getElementById('segmentListResults');
+
+    if (!segments || segments.length === 0) {
+      resultsDiv.innerHTML = '<div style="text-align:center;padding:30px;background:var(--bg-secondary);border-radius:12px;"><i class="fa-solid fa-folder-open" style="font-size:36px;color:var(--text-secondary);margin-bottom:12px;"></i><br/><strong>청크가 없습니다</strong></div>';
+      return;
+    }
+
+    let html = '<div style="margin-bottom:12px;color:var(--text-secondary);font-size:13px;"><i class="fa-solid fa-check-circle" style="color:var(--kt-green);"></i> ' + segments.length + ' 개의 청크가 있습니다.</div>';
+
+    segments.forEach(function(seg, i) {
+      const content = seg.content || '내용 없음';
+      const id = seg.id || '';
+
+      html += '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:10px;padding:16px;margin-bottom:12px;">' +
+        '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">' +
+          '<strong style="color:var(--kt-red);">청크 #' + (i + 1) + '</strong>' +
+          '<span style="font-size:11px;color:var(--text-secondary);">ID: ' + escapeHtml(id) + '</span>' +
+        '</div>' +
+        '<div style="font-size:13px;line-height:1.7;color:var(--text-primary);white-space:pre-wrap;">' + escapeHtml(content).substring(0, 500) + '</div>' +
+      '</div>';
+    });
+
+    resultsDiv.innerHTML = html;
+  } catch (err) {
+    const resultsDiv = document.getElementById('segmentListResults');
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 조회 오류: ' + escapeHtml(err.message) + '</div>';
+  }
 }
 
 // 지식 검색 화면
@@ -1027,7 +1316,22 @@ async function executeKnowledgeSearch(query) {
 
   try {
     const data = await fetchKnowledgeSearch(query);
-    const docs = data.docs || data.data || [];
+
+    // ABCLab Knowledge API 응답 파싱: { records: [{ score, segment: { content } }] }
+    let docs = [];
+    if (data.records && Array.isArray(data.records)) {
+      docs = data.records.map(function(r) {
+        return {
+          content: r.segment?.content || '',
+          score: r.score || 0,
+          source: r.segment?.metadata?.source || ''
+        };
+      });
+    } else if (data.docs) {
+      docs = data.docs;
+    } else if (data.data) {
+      docs = data.data;
+    }
 
     if (docs.length === 0) {
       resultsDiv.innerHTML = '<div style="text-align:center;padding:30px;background:var(--bg-secondary);border-radius:12px;"><i class="fa-solid fa-folder-open" style="font-size:36px;color:var(--text-secondary);margin-bottom:12px;"></i><br/><strong>검색 결과가 없습니다</strong><br/><span style="font-size:13px;color:var(--text-secondary);">"' + escapeHtml(query) + '" 에 대한 지식이 아직 등록되지 않았습니다.</span></div>';
@@ -1052,7 +1356,17 @@ async function executeKnowledgeSearch(query) {
 
     resultsDiv.innerHTML = html;
   } catch (err) {
-    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 검색 오류: ' + escapeHtml(err.message) + '</div>';
+    console.error('[Knowledge Search Error]', err);
+    let errorMsg = err.message;
+    // 백엔드에서 반환한 상세 오류 정보 파싱
+    try {
+      const errData = JSON.parse(err.message);
+      if (errData.full_error) {
+        const backendErr = JSON.parse(errData.full_error);
+        errorMsg = (backendErr.message || backendErr.error || err.message);
+      }
+    } catch(e) {}
+    resultsDiv.innerHTML = '<div style="text-align:center;padding:20px;background:var(--bg-secondary);border-radius:12px;color:var(--kt-red);"><i class="fa-solid fa-triangle-exclamation"></i> 검색 오류: ' + escapeHtml(errorMsg) + '<br/><span style="font-size:12px;color:var(--text-secondary);">백엔드 로그를 확인하세요.</span></div>';
   }
 }
 
@@ -1519,8 +1833,268 @@ async function executeSegmentCreate(datasetId, documentId, text) {
 }
 
 /* ============================================================
-  STP 운영 담당자 연락처 키워드 감지 및 즉시 응답
-   ============================================================ */
+   STP 운영 담당자 연락처 키워드 감지 및 즉시 응답
+    ============================================================ */
+
+/* --- 구조화된 담당자 데이터 (이름 검색용) --- */
+const CONTACT_DATABASE = [
+  // STP 운영 담당자 (general)
+  { name: '채혜성', rank: '책임', group: 'stp', area: 'KT · Alpha · Skylife', team: '', note: '', roles: ['stp 운영'] },
+  { name: '장미경', rank: '책임', group: 'stp', area: 'KT · Alpha · Skylife', team: '', note: '', roles: ['stp 운영'] },
+  { name: '배지현', rank: '선임', group: 'stp', area: 'KT · Alpha · Skylife', team: '', note: '', roles: ['stp 운영'] },
+  { name: '조혜승', rank: '선임', group: 'stp', area: 'Netcore · P&M · Cloud · Sat', team: '', note: '', roles: ['stp 운영'] },
+  { name: '김연수', rank: '선임', group: 'stp', area: 'Netcore · P&M · Cloud · Sat', team: '', note: '', roles: ['stp 운영'] },
+  { name: '김정환', rank: '과장', group: 'stp', area: 'KT ds · engcore · estate', team: '', note: '', roles: ['stp 운영'] },
+  // KT ALPHA 시스템 담당자
+  { name: '강남석', rank: '책임', group: 'alpha', area: 'ERP PM', team: '재무DX개발팀', note: '', roles: ['pm', 'erp pm', '프로젝트 관리'] },
+  { name: '김인수', rank: '과장', group: 'alpha', area: 'ERP FI 담당자', team: '협력사', note: 'ALPHA 전반적인 프로세스 및 배포 등 모든 문의', roles: ['fi', 'erp fi', '회계'] },
+  { name: '오슬기', rank: '과장', group: 'alpha', area: 'BO 시스템 담당', team: '방송플랫폼개발팀', note: '', roles: ['bo', 'bo 시스템'] },
+  { name: '신지수', rank: '과장', group: 'alpha', area: '수불입고 / 구매입고', team: '회계서비스팀', note: '', roles: ['수불입고', '구매입고', '입고'] },
+  { name: '이영미', rank: '과장', group: 'alpha', area: '수불출고 / 신구품전환 / 월마감', team: 'SCM팀', note: '', roles: ['수불출고', '신구품전환', '월마감', '출고'] },
+  { name: '김소연', rank: '차장', group: 'alpha', area: '회계처리', team: '회계팀', note: '', roles: ['회계처리', '회계'] },
+  { name: '오준혁', rank: '사원', group: 'alpha', area: 'KIMS 담당', team: '인프라DX팀', note: '그룹웨어는 가온아이 솔루션 회사측 담당자 (오준혁 사원에게 선 연락)', roles: ['kims', '그룹웨어'] },
+  { name: '김동진', rank: '과장', group: 'alpha', area: '자재코드연동', team: '방송플랫폼개발팀', note: '', roles: ['자재코드', '자재코드연동'] },
+  // kt netcore | kt p&m 시스템 담당자
+  { name: '김민정', rank: '책임', group: 'netcore-pm', area: 'ERP PM', team: '재무 DX 서비스팀', note: '', roles: ['pm', 'erp pm', '프로젝트 관리'] },
+  { name: '김기연', rank: '위원', group: 'netcore-pm', area: 'ERP FI 담당자', team: '협력사', note: '', roles: ['fi', 'erp fi', '회계'] },
+  { name: '김소영', rank: '대리', group: 'netcore-pm', area: 'ERP CO 담당자 / ERP FM 담당자', team: '협력사', note: '', roles: ['co', 'fm', 'erp co', 'erp fm', '손익', '재원'] },
+  { name: '강권찬', rank: '위원', group: 'netcore-pm', area: 'BPM 담당자', team: '협력사', note: '', roles: ['bpm'] },
+  { name: '박봉희', rank: '위원', group: 'netcore-pm', area: 'SRM 담당자', team: '협력사', note: '', roles: ['srm'] },
+  { name: '김성현', rank: '대리', group: 'netcore-pm', area: 'ATACAMA', team: '협력사', note: '', roles: ['atacama', '설계'] },
+  { name: '김의성', rank: '차장', group: 'netcore-pm', area: '넷코어 IT 담당자', team: '구매계약부', note: '', roles: ['it', '넷코어 it'] },
+  { name: '한지석', rank: '사원', group: 'netcore-pm', area: '넷코어 IT 담당자', team: '구매계약부', note: '', roles: ['it', '넷코어 it'] },
+  // KT CLOUD - 협력사/ITO담당자
+  { name: '박병철', rank: '', group: 'cloud', area: 'FI (AP/AR/GL)', team: 'ITO (협력사)', note: '010-2557-6024', roles: ['fi', 'ap', 'ar', 'gl'] },
+  { name: '신정우', rank: '', group: 'cloud', area: 'FI (AP/AR/GL)', team: 'ITO (협력사)', note: '', roles: ['fi', 'ap', 'ar', 'gl'] },
+  { name: '백종환', rank: '', group: 'cloud', area: 'FI (AP/AR/GL)', team: 'ITO (협력사)', note: '', roles: ['fi', 'ap', 'ar', 'gl'] },
+  { name: '최정섭', rank: '', group: 'cloud', area: '펌뱅킹 (자금 관리)', team: 'ITO (협력사)', note: '010-3542-5112', roles: ['펌뱅킹', '자금'] },
+  { name: '권재순', rank: '', group: 'cloud', area: 'Bizplay (법인카드 관리)', team: 'ITO (협력사)', note: '010-2642-1243', roles: ['bizplay', '법인카드'] },
+  { name: '김나나', rank: '', group: 'cloud', area: 'MM (물자/공사/용역 구매)', team: 'ITO (협력사)', note: '', roles: ['mm', '구매', '물자'] },
+  { name: '인한얼', rank: '과장', group: 'cloud', area: 'HR (인사/조직,연동)', team: 'ITO (협력사)', note: '010-4188-6982', roles: ['hr', '인사'] },
+  { name: '현재유', rank: '', group: 'cloud', area: 'BC', team: 'ITO (협력사)', note: '', roles: ['bc'] },
+  { name: '신동민', rank: '', group: 'cloud', area: 'BC', team: 'ITO (협력사)', note: '', roles: ['bc'] },
+  { name: '송근배', rank: '과장', group: 'cloud', area: 'GRC (권한,계정,감사대응)', team: 'ITO (협력사)', note: '010-8961-9421', roles: ['grc', '권한', '계정', '감사'] },
+  { name: '조승현', rank: '차장', group: 'cloud', area: 'MDM', team: 'ITO (애버커스)', note: '', roles: ['mdm'] },
+  { name: '신현명', rank: '차장', group: 'cloud', area: '바코드', team: 'ITO (협력사)', note: '010-4517-2997', roles: ['바코드'] },
+  { name: '오규환', rank: '', group: 'cloud', area: '바코드', team: 'ITO (애버커스)', note: '', roles: ['바코드'] },
+  { name: '이주헌', rank: '과장', group: 'cloud', area: 'SRM', team: 'ITO (협력사)', note: '', roles: ['srm'] },
+  { name: '장웅재', rank: '', group: 'cloud', area: 'BC', team: 'KT DS ITO (재무DX 서비스팀)', note: '', roles: ['bc'] },
+  { name: '송은주', rank: '', group: 'cloud', area: 'MDM', team: 'KT DS ITO (Biz DX서비스팀)', note: '', roles: ['mdm'] },
+  { name: '최승희', rank: '', group: 'cloud', area: 'EAI', team: 'KT DS ITO (Biz DX서비스팀)', note: '', roles: ['eai'] },
+  { name: '정다운', rank: '', group: 'cloud', area: 'EAI', team: 'KT DS ITO (Biz DX서비스팀)', note: '', roles: ['eai'] },
+  { name: '백민아', rank: '', group: 'cloud', area: 'PS (프로젝트 관리)', team: 'KT DS ITO (물류 DX 서비스팀)', note: '', roles: ['ps', '프로젝트 관리'] },
+  { name: '이상호', rank: '', group: 'cloud', area: 'PS (프로젝트 관리)', team: 'KT DS ITO (물류 DX 서비스팀)', note: '', roles: ['ps', '프로젝트 관리'] },
+  { name: '천혜연', rank: '', group: 'cloud', area: 'PM (설비관리/바코드)', team: 'KT DS ITO (물류 DX 서비스팀)', note: '', roles: ['pm', '설비관리', '바코드'] },
+  { name: '박재운', rank: '', group: 'cloud', area: 'CO/FM (손익/예산 관리)', team: 'KT DS ITO (재무DX 서비스팀)', note: '', roles: ['co', 'fm', '손익', '예산'] },
+  { name: '원승희', rank: '', group: 'cloud', area: 'CO/FM (손익/예산 관리)', team: 'KT DS ITO (재무DX 서비스팀)', note: '', roles: ['co', 'fm', '손익', '예산'] },
+  // KT SKYLIFE 시스템 담당자
+  { name: '인하영', rank: '책임', group: 'skylife', area: 'ERP PM / ERP HR ITO', team: '물류DX개발팀', note: '', roles: ['pm', 'erp pm', 'hr', 'erp hr'] },
+  { name: '김참이', rank: '선임', group: 'skylife', area: 'ERP HR ITO', team: '물류DX개발팀', note: '', roles: ['hr', 'erp hr'] },
+  { name: '김혜지', rank: '선임', group: 'skylife', area: 'ERP FI ITO', team: '재무DX개발팀', note: '', roles: ['fi', 'erp fi'] },
+  { name: '송치현', rank: '과장', group: 'skylife', area: 'ERP CO ITO', team: '재무DX개발팀(협력사)', note: '', roles: ['co', 'erp co'] },
+  { name: '김이준', rank: '선임', group: 'skylife', area: 'ERP EP ITO', team: '물류DX개발팀', note: '', roles: ['ep', 'erp ep'] },
+  { name: '장웅재', rank: '책임', group: 'skylife', area: 'ERP BC ITO', team: '재무DX개발팀', note: '', roles: ['bc', 'erp bc'] },
+  { name: '전형순', rank: '팀장', group: 'skylife', area: 'skylife ERP 운영 전반', team: 'skylife IT기획팀', note: '', roles: ['운영', 'erp 운영'] },
+  { name: '선윤오', rank: '사원', group: 'skylife', area: 'skylife ERP 운영 전반 / 자재코드 생성 및 IMG 세팅', team: 'skylife IT기획팀', note: '', roles: ['운영', 'erp 운영', '자재코드'] },
+  { name: '박승현', rank: '대리', group: 'skylife', area: '기초입고 / 구매입고 / 단가조정 / 출고 / 물류 월 마감', team: '기술전략팀', note: '', roles: ['입고', '기초입고', '구매입고', '단가조정', '출고', '월마감'] },
+  { name: '안지홍', rank: '사원', group: 'skylife', area: '기초입고 / 구매입고 / 단가조정 / 출고 / 물류 월 마감', team: '기술전략팀', note: '', roles: ['입고', '기초입고', '구매입고', '단가조정', '출고', '월마감'] }
+];
+
+/**
+ * 질문에서人名 추출 (한국어 2-4글자 + 직급 패턴)
+ */
+function extractPersonName(text) {
+  // "김성현 대리는", "김성현은", "김성현", "김성현 과장" 등 패턴
+  var namePatterns = [
+    // 이름 + 직급: 김성현 대리, 김인수 과장, 강남석 책임
+    /([가-힣]{2,4})\s*(대리|과장|차장|부장|책임|위원|선임|사원|팀장)/,
+    // 이름 + 은/는/이/가: 김성현은, 김성현이, 김성현은
+    /([가-힣]{2,4})(?:은|는|이|가)/,
+    // "OOO 어떤", "OOO 누구", "OOO 알려": 김성현 어떤, 김성현 누구
+    /([가-힣]{2,4})\s*(?:어떤|누구|알려)/,
+  ];
+  
+  for (var i = 0; i < namePatterns.length; i++) {
+    var match = text.match(namePatterns[i]);
+    if (match) return match[1];
+  }
+  return null;
+}
+
+/**
+ * 이름으로 담당자 검색 (모든 그룹사 데이터베이스 검색)
+ * 매칭된 담당자 배열 반환 (0개 = 없음, 1개+ = 매칭됨)
+ */
+function searchContactByName(personName) {
+  var results = [];
+  for (var i = 0; i < CONTACT_DATABASE.length; i++) {
+    var entry = CONTACT_DATABASE[i];
+    if (entry.name === personName) {
+      results.push(entry);
+    }
+  }
+  return results;
+}
+
+/**
+ * 검색된 담당자 정보를 HTML 응답으로 빌드
+ */
+function buildPersonSearchAnswer(results, personName) {
+  if (results.length === 0) return null;
+  
+  var html = '<strong>🔍 ' + personName + ' 담당자 검색 결과</strong><br/><br/>';
+  html += '<div style="font-size:13px;">';
+  
+  for (var i = 0; i < results.length; i++) {
+    var r = results[i];
+    var groupLabel = '';
+    if (r.group === 'stp') groupLabel = 'STP 운영';
+    else if (r.group === 'alpha') groupLabel = 'KT ALPHA';
+    else if (r.group === 'netcore-pm') groupLabel = 'kt netcore | kt p&m';
+    else if (r.group === 'cloud') groupLabel = 'KT CLOUD';
+    else if (r.group === 'skylife') groupLabel = 'KT SKYLIFE';
+    
+    html += '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:12px 16px;margin-bottom:8px;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+    html += '<span style="background:var(--kt-red);color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold;">' + groupLabel + '</span>';
+    html += '<strong style="font-size:15px;">' + r.name + (r.rank ? ' ' + r.rank : '') + '</strong>';
+    html += '</div>';
+    html += '<div style="padding-left:4px;">';
+    html += '<div>📌 <strong>담당 영역:</strong> ' + r.area + '</div>';
+    if (r.team) {
+      html += '<div>🏢 <strong>소속:</strong> ' + r.team + '</div>';
+    }
+    if (r.note) {
+      html += '<div>💡 <strong>비고:</strong> ' + r.note + '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+  }
+  
+  html += '</div>';
+  html += '<br/><small style="color:var(--text-secondary);">전체 담당자 목록은 "STP 운영 담당부서를 알려주세요"를 참고해 주세요.</small>';
+  
+  return html;
+}
+
+/**
+ * 그룹사 감지 (질문 텍스트에서)
+ */
+function detectGroupFromText(text) {
+  var lower = text.toLowerCase();
+  if (lower.includes('alpha') || lower.includes('알파')) return 'alpha';
+  if (lower.includes('netcore') || lower.includes('p&m') || lower.includes('넷코어') || lower.includes('신설법인')) return 'netcore-pm';
+  if (lower.includes('kt cloud') || lower.includes('ktcloud') || lower.includes('kt 클라우드') || lower.includes('클라우드')) return 'cloud';
+  if (lower.includes('skylife') || lower.includes('스카이라이프')) return 'skylife';
+  return null;
+}
+
+/**
+ * 역할/직책 기반 담당자 검색
+ * "kt netcore PM 누구야?" → group='netcore-pm', role='pm' → 김민정 책임
+ */
+function searchContactByRole(text) {
+  var detectedGroup = detectGroupFromText(text);
+  if (!detectedGroup) return null;
+  
+  // 질문에서 역할 키워드 추출 (그룹사 키워드 제거 후 남은 부분)
+  var cleaned = text.toLowerCase()
+    .replace(/kt\s*/g, '')
+    .replace(/netcore/g, '')
+    .replace(/p&m/g, '')
+    .replace(/알파/g, '')
+    .replace(/alpha/g, '')
+    .replace(/클라우드/g, '')
+    .replace(/cloud/g, '')
+    .replace(/스카이라이프/g, '')
+    .replace(/skylife/g, '')
+    .replace(/넷코어/g, '')
+    .replace(/신설법인/g, '')
+    .replace(/누구/g, '')
+    .replace(/야/g, '')
+    .replace(/해/g, '')
+    .replace(/줘/g, '')
+    .replace(/어/g, '')
+    .replace(/아/g, '')
+    .replace(/는/g, '')
+    .replace(/은/g, '')
+    .replace(/이/g, '')
+    .replace(/가/g, '')
+    .replace(/의/g, '')
+    .replace(/의/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  
+  if (!cleaned) return null;
+  
+  // CONTACT_DATABASE에서 group 매칭 + roles/area 매칭
+  var results = [];
+  for (var i = 0; i < CONTACT_DATABASE.length; i++) {
+    var entry = CONTACT_DATABASE[i];
+    if (entry.group !== detectedGroup) continue;
+    
+    // roles 배열 매칭
+    if (entry.roles) {
+      for (var j = 0; j < entry.roles.length; j++) {
+        if (cleaned.includes(entry.roles[j]) || entry.roles[j].includes(cleaned)) {
+          results.push(entry);
+          break;
+        }
+      }
+    }
+    
+    // area 매칭 (roles로 못 찾으면 area로도 시도)
+    if (results.length === 0 && entry.area) {
+      var areaLower = entry.area.toLowerCase();
+      if (cleaned.includes(areaLower) || areaLower.includes(cleaned)) {
+        results.push(entry);
+      }
+    }
+  }
+  
+  return results.length > 0 ? results : null;
+}
+
+/**
+ * 역할 검색 결과를 HTML 응답으로 빌드
+ */
+function buildRoleSearchAnswer(results, text, group) {
+  if (!results || results.length === 0) return null;
+  
+  var groupLabel = '';
+  if (group === 'alpha') groupLabel = 'KT ALPHA';
+  else if (group === 'netcore-pm') groupLabel = 'kt netcore | kt p&m';
+  else if (group === 'cloud') groupLabel = 'KT CLOUD';
+  else if (group === 'skylife') groupLabel = 'KT SKYLIFE';
+  
+  var html = '<strong>🔍 ' + groupLabel + ' 담당자 검색 결과</strong><br/><br/>';
+  html += '<div style="font-size:13px;">';
+  
+  for (var i = 0; i < results.length; i++) {
+    var r = results[i];
+    html += '<div style="background:var(--bg-card);border:1px solid var(--border-color);border-radius:8px;padding:12px 16px;margin-bottom:8px;">';
+    html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
+    html += '<span style="background:var(--kt-red);color:#fff;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:bold;">' + groupLabel + '</span>';
+    html += '<strong style="font-size:15px;">' + r.name + (r.rank ? ' ' + r.rank : '') + '</strong>';
+    html += '</div>';
+    html += '<div style="padding-left:4px;">';
+    html += '<div>📌 <strong>담당 영역:</strong> ' + r.area + '</div>';
+    if (r.team) {
+      html += '<div>🏢 <strong>소속:</strong> ' + r.team + '</div>';
+    }
+    if (r.note) {
+      html += '<div>💡 <strong>비고:</strong> ' + r.note + '</div>';
+    }
+    html += '</div>';
+    html += '</div>';
+  }
+  
+  html += '</div>';
+  html += '<br/><small style="color:var(--text-secondary);">전체 담당자 목록은 "' + groupLabel + ' 담당자 연락처 알려주세요"를 참고해 주세요.</small>';
+  
+  return html;
+}
+
 const CONTACT_KEYWORDS = ['STP 담당자','STP 연락처','STP 담당부서','STP 운영 담당','STP 운영담당','STP 담당자 연락','STP 책임자'];
 
 function isContactQuery(text) {
@@ -1533,16 +2107,24 @@ function isContactQuery(text) {
     return false;
   }
   
-  // 담당자/연락처 키워드가 포함되면 무조건 담당자 연락처로 처리 (우선순위 최상)
-  // AI 모델의 PII 마스킹을 우회하기 위해 최대한 넓은 범위로 감지
+  // 담당자/연락처 키워드가 포함되면 담당자 연락처로 처리 (우선순위 최상)
+  // AI 모델의 PII 마스킹을 우회하기 위해 연락처 조회 의도가 명확한 패턴만 감지
+  // '담당자', '연락처' 등 단일 키워드는 제거 (거짓 양성 방지: "김성현 대리는 어떤 담당자야?" 등)
   const contactKeywords = [
-    'STP 담당자','STP 담당부서','STP 운영 담당','STP 운영담당','담당자 연락처','연락처 알려주세요','담당자 알려주세요',
-    // 일반 담당자/연락처 키워드 (AI 응답 대신 하드코딩 테이블 사용)
-    '담당자','연락처','담당부서','운영 담당','운영담당','담당자 연락','책임자',
-    '전화번호','전화번호 알려','연락 방법','연락처','전화','휴대폰','핸드폰',
-    '누가 담당','누가 책임','누구에게','누구한테','문의처','문의 방법',
+    // STP 운영 담당자 명시적 요청
+    'STP 담당자','STP 담당부서','STP 운영 담당','STP 운영담당','STP 책임자',
+    // 연락처 조회 의도가 명확한 패턴
+    '담당자 연락처','연락처 알려','담당자 알려','담당부서 알려','운영 담당 알려',
+    '담당자 연락','담당자 누구','누가 담당','누가 책임','누구에게','누구한테',
+    '문의처','문의 방법','연락 방법',
+    // 전화번호 조회 의도
+    '전화번호','전화번호 알려','전화 알려','휴대폰','핸드폰',
+    // 그룹사별 담당자 연락처 요청
     'alpha 담당자','alpha 담당','알파 담당자','알파 담당',
-    'netcore 담당','넷코어 담당','p&m 담당','클라우드 담당','skylife 담당','스카이라이프 담당'
+    'netcore 담당','넷코어 담당','p&m 담당','클라우드 담당','skylife 담당','스카이라이프 담당',
+    // 일반 연락처 요청 (단일 '연락처'는 제외, 의도 명확한 패턴만)
+    '연락처 주세요','연락처 알려줘','연락처 찾아','담당자 주세요','담당자 찾아',
+    '내부 연락처','연락처 문의'
   ];
   if (contactKeywords.some(function(kw) { return text.includes(kw); })) {
     return true;
@@ -2312,7 +2894,7 @@ const NEW_COMPANY_KEYWORDS = ['신설법인 프로세스','신설법인프로세
 
 function isNewCompanyQuery(text) {
   // 담당자/연락처 키워드가 포함되면 프로세스가 아닌 담당자 연락처로 처리
-  const contactKeywords = ['담당자','연락처','담당부서','운영 담당','운영담당','담당자 연락','책임자'];
+  const contactKeywords = ['담당자'];
   if (contactKeywords.some(function(kw) { return text.includes(kw); })) {
     return false;
   }
@@ -3974,6 +4556,39 @@ updateStats();
     }
   }
 
+  // 담당자 역할/직책 검색 (이름 검색보다 먼저 - "kt netcore PM 누구야?" 등)
+  var roleResults = searchContactByRole(text);
+  if (roleResults) {
+    console.log('[DEBUG] Role search found:', roleResults.length, 'matches for:', text);
+    var bubble_role = createAgentBubble('etc');
+    if (bubble_role) bubble_role.innerHTML = buildRoleSearchAnswer(roleResults, text, detectGroupFromText(text));
+    scrollBottom();
+    state.stats.pending  = Math.max(0, state.stats.pending - 1);
+    state.stats.resolved += 1;
+    updateStats();
+    var conv_role = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+    if (conv_role) conv_role.status = 'done';
+    return;
+  }
+  
+  // 담당자 이름 검색 (최우선순위 - 이름이 포함된 질문은 먼저 담당자 DB 검색)
+  var personName = extractPersonName(text);
+  if (personName) {
+    var personResults = searchContactByName(personName);
+    if (personResults.length > 0) {
+      console.log('[DEBUG] Person name found:', personName, '->', personResults.length, 'matches');
+      var bubble = createAgentBubble('etc');
+      if (bubble) bubble.innerHTML = buildPersonSearchAnswer(personResults, personName);
+      scrollBottom();
+      state.stats.pending  = Math.max(0, state.stats.pending - 1);
+      state.stats.resolved += 1;
+      updateStats();
+      var conv = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+      if (conv) conv.status = 'done';
+      return;
+    }
+  }
+  
   // 담당자 연락처 질문 감지 (최우선순위 - 다른 모든 질문보다 먼저 검사)
   console.log('[DEBUG] Checking contact query:', text);
   if (isContactQuery(text)) {
@@ -3991,7 +4606,7 @@ updateStats();
       if (lowerText.includes('alpha') || lowerText.includes('알파')) {
         currentCategory = 'alpha';
         console.log('[DEBUG] Detected Alpha from query text');
-      } else if (lowerText.includes('netcore') || lowerText.includes('p&m') || lowerText.includes('넷코어')) {
+      } else if (lowerText.includes('netcore') || lowerText.includes('p&m') || lowerText.includes('넷코어') || lowerText.includes('신설법인')) {
         currentCategory = 'netcore-pm';
         console.log('[DEBUG] Detected Netcore/P&M from query text');
       } else if (lowerText.includes('kt cloud') || lowerText.includes('ktcloud') || lowerText.includes('kt 클라우드') || lowerText.includes('클라우드')) {
@@ -4038,19 +4653,33 @@ updateStats();
         delete $chatMessages.dataset.currentCategory;
       }
     } else {
-      // STP 운영 담당자 연락처
-      console.log('[DEBUG] Showing General STP Contact');
-      if (bubble) bubble.innerHTML = buildContactAnswer();
+      // 그룹사 감지 실패 → CONTACT_DATABASE 에서 역할/영역 기반 검색 시도
+      console.log('[DEBUG] Group detection failed, searching CONTACT_DATABASE by role/area...');
+      var roleFallback = searchContactByRole(text);
+      if (roleFallback && roleFallback.length > 0) {
+        console.log('[DEBUG] Found ' + roleFallback.length + ' contacts by role/area fallback');
+        if (bubble) bubble.innerHTML = buildRoleSearchAnswer(roleFallback, text, detectGroupFromText(text));
+      } else {
+        // CONTACT_DATABASE 도 없음 → 지식 컨텍스트 (DIFY AI) 참조
+        console.log('[DEBUG] No contact found in DATABASE, falling through to DIFY AI for knowledge lookup');
+        // fallthrough 전 빈 버블 제거
+        if (bubble) bubble.parentElement.remove();
+        // 아래 DIFY AI 로직으로 fallthrough (return 하지 않음)
+      }
     }
     
-    scrollBottom();
-    const elapsed = Date.now() - startTime;
-    state.stats.pending   = Math.max(0, state.stats.pending - 1);
-    state.stats.resolved += 1;
-    updateStats();
-    const conv = state.conversations.find(function(c) { return c.id === state.currentConvId; });
-    if (conv) conv.status = 'done';
-    return;
+    // fallback 이 아닌 정상 경로만 여기서 return
+    if (currentCategory || roleFallback) {
+      scrollBottom();
+      const elapsed = Date.now() - startTime;
+      state.stats.pending   = Math.max(0, state.stats.pending - 1);
+      state.stats.resolved += 1;
+      updateStats();
+      const conv = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+      if (conv) conv.status = 'done';
+      return;
+    }
+    // 그룹사 감지 실패 + DB 검색 실패 → 아래 DIFY AI 로 fallthrough
   }
 
   // 연계 시스템 질문 감지
@@ -4101,12 +4730,57 @@ updateStats();
     return;
   }
 
+  // 담당자 이름 검색 (두 번째 체크 포인트)
+  var personName2 = extractPersonName(text);
+  if (personName2) {
+    var personResults2 = searchContactByName(personName2);
+    if (personResults2.length > 0) {
+      var bubble3 = createAgentBubble('etc');
+      if (bubble3) bubble3.innerHTML = buildPersonSearchAnswer(personResults2, personName2);
+      scrollBottom();
+      state.stats.pending   = Math.max(0, state.stats.pending - 1);
+      state.stats.resolved += 1;
+      updateStats();
+      var conv3 = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+      if (conv3) conv3.status = 'done';
+      return;
+    }
+  }
+  
+  // 역할/직책 기반 담당자 검색 (두 번째 체크 포인트)
+  var roleResult2 = searchContactByRole(text);
+  if (roleResult2) {
+    var bubble4 = createAgentBubble('etc');
+    if (bubble4) bubble4.innerHTML = buildRoleSearchAnswer(roleResult2, text, detectGroupFromText(text));
+    scrollBottom();
+    state.stats.pending   = Math.max(0, state.stats.pending - 1);
+    state.stats.resolved += 1;
+    updateStats();
+    var conv4 = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+    if (conv4) conv4.status = 'done';
+    return;
+  }
+  
   if (isContactQuery(text)) {
     const startTime = Date.now();
     const bubble = createAgentBubble('etc');
     
-    // 현재 카테고리 확인
-    const currentCategory = $chatMessages ? $chatMessages.dataset.currentCategory : null;
+    // 현재 카테고리 확인 (메뉴 클릭으로 설정된 카테고리)
+    let currentCategory = $chatMessages ? $chatMessages.dataset.currentCategory : null;
+    
+    // 질문 텍스트에서 그룹사 키워드 감지 (메뉴 클릭 안했어도 자동 감지)
+    const lowerText2 = text.toLowerCase();
+    if (!currentCategory) {
+      if (lowerText2.includes('alpha') || lowerText2.includes('알파')) {
+        currentCategory = 'alpha';
+      } else if (lowerText2.includes('netcore') || lowerText2.includes('p&m') || lowerText2.includes('넷코어') || lowerText2.includes('신설법인')) {
+        currentCategory = 'netcore-pm';
+      } else if (lowerText2.includes('kt cloud') || lowerText2.includes('ktcloud') || lowerText2.includes('kt 클라우드') || lowerText2.includes('클라우드')) {
+        currentCategory = 'cloud';
+      } else if (lowerText2.includes('skylife') || lowerText2.includes('스카이라이프')) {
+        currentCategory = 'skylife';
+      }
+    }
     
     if (currentCategory === 'alpha') {
       // KT ALPHA 담당자 연락처
@@ -4137,19 +4811,33 @@ updateStats();
         delete $chatMessages.dataset.currentCategory;
       }
     } else {
-      // STP 운영 담당자 연락처
-      if (bubble) bubble.innerHTML = buildContactAnswer();
+      // 그룹사 감지 실패 → CONTACT_DATABASE 에서 역할/영역 기반 검색 시도
+      console.log('[DEBUG] Group detection failed (2nd check), searching CONTACT_DATABASE by role/area...');
+      var roleFallback2 = searchContactByRole(text);
+      if (roleFallback2 && roleFallback2.length > 0) {
+        console.log('[DEBUG] Found ' + roleFallback2.length + ' contacts by role/area fallback (2nd check)');
+        if (bubble) bubble.innerHTML = buildRoleSearchAnswer(roleFallback2, text, detectGroupFromText(text));
+      } else {
+        // CONTACT_DATABASE 도 없음 → 지식 컨텍스트 (DIFY AI) 참조
+        console.log('[DEBUG] No contact found in DATABASE (2nd check), falling through to DIFY AI for knowledge lookup');
+        // fallthrough 전 빈 버블 제거
+        if (bubble) bubble.parentElement.remove();
+        // 아래 DIFY AI 로직으로 fallthrough (return 하지 않음)
+      }
     }
     
-    scrollBottom();
-    const elapsed = Date.now() - startTime;
-    state.stats.responseTimes.push(elapsed);
-    state.stats.pending   = Math.max(0, state.stats.pending - 1);
-    state.stats.resolved += 1;
-    updateStats();
-    const conv = state.conversations.find(function(c) { return c.id === state.currentConvId; });
-    if (conv) conv.status = 'done';
-    return;
+    // fallback 이 아닌 정상 경로만 여기서 return
+    if (currentCategory || roleFallback2) {
+      scrollBottom();
+      const elapsed = Date.now() - startTime;
+      state.stats.pending   = Math.max(0, state.stats.pending - 1);
+      state.stats.resolved += 1;
+      updateStats();
+      const conv = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+      if (conv) conv.status = 'done';
+      return;
+    }
+    // 그룹사 감지 실패 + DB 검색 실패 → 아래 DIFY AI 로 fallthrough
   }
 
   // SAP PO 조회 질문 감지 (우선순위 높음)
