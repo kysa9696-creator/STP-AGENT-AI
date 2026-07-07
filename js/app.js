@@ -4627,6 +4627,13 @@ updateStats();
       if ($chatMessages) {
         delete $chatMessages.dataset.currentCategory;
       }
+      scrollBottom();
+      state.stats.pending   = Math.max(0, state.stats.pending - 1);
+      state.stats.resolved += 1;
+      updateStats();
+      const conv_alpha = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+      if (conv_alpha) conv_alpha.status = 'done';
+      return;
     } else if (currentCategory === 'netcore-pm') {
       // kt netcore | kt p&m 담당자 연락처
       console.log('[DEBUG] Showing Netcore/P&M Contact');
@@ -4635,6 +4642,13 @@ updateStats();
       if ($chatMessages) {
         delete $chatMessages.dataset.currentCategory;
       }
+      scrollBottom();
+      state.stats.pending   = Math.max(0, state.stats.pending - 1);
+      state.stats.resolved += 1;
+      updateStats();
+      const conv_netcore = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+      if (conv_netcore) conv_netcore.status = 'done';
+      return;
     } else if (currentCategory === 'cloud') {
       // KT CLOUD 담당자 연락처
       console.log('[DEBUG] Showing KT CLOUD Contact');
@@ -4643,6 +4657,13 @@ updateStats();
       if ($chatMessages) {
         delete $chatMessages.dataset.currentCategory;
       }
+      scrollBottom();
+      state.stats.pending   = Math.max(0, state.stats.pending - 1);
+      state.stats.resolved += 1;
+      updateStats();
+      const conv_cloud = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+      if (conv_cloud) conv_cloud.status = 'done';
+      return;
     } else if (currentCategory === 'skylife') {
       // KT SKYLIFE 담당자 연락처
       console.log('[DEBUG] Showing KT SKYLIFE Contact');
@@ -4651,6 +4672,13 @@ updateStats();
       if ($chatMessages) {
         delete $chatMessages.dataset.currentCategory;
       }
+      scrollBottom();
+      state.stats.pending   = Math.max(0, state.stats.pending - 1);
+      state.stats.resolved += 1;
+      updateStats();
+      const conv_skylife = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+      if (conv_skylife) conv_skylife.status = 'done';
+      return;
     } else {
       // 그룹사 감지 실패 → CONTACT_DATABASE 에서 역할/영역 기반 검색 시도
       console.log('[DEBUG] Group detection failed, searching CONTACT_DATABASE by role/area...');
