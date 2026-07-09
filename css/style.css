@@ -32,7 +32,7 @@
   display: inline-block;
   width: 1.4em;
   text-align: center;
-  color: #FFFFFF; /* 하얀색 */
+  color: #FFFFFF; /* ?�색 */
 }
 
 /* ---------- CSS Variables ---------- */
@@ -2226,9 +2226,9 @@ body:not(.dark-theme) .message-row.agent .msg-avatar {
   margin: 3px 0;
   line-height: 1.6;
 }
-/* ???�식 ?��???- JavaScript에서 처리?��?�?기본 ?��??�만 ?��? */
+/* ???�식 ?��???- JavaScript ?�서 처리?��?�?기본 ?��??�만 ?��? */
 .message-row.agent .msg-bubble > div {
-  /* JavaScript에서 처리 */
+  /* JavaScript ?�서 ?�라???��???처리 */
 }
 .message-row.agent .msg-bubble h1,
 .message-row.agent .msg-bubble h2,
