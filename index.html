@@ -9,7 +9,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 </head>
 <body>
-  <!-- ===== HEADER ==== -->
+  <!-- ===== HEADER ===== -->
   <header class="header">
     <div class="header-inner">
       <div class="logo-area">
@@ -41,50 +41,12 @@
   <main class="main-container">
     <section class="tab-section active" id="tab-chat">
       <div class="chat-layout">
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
           <div class="sidebar-header">
             <h3><i class="fa-solid fa-layer-group"></i> 업무 카테고리</h3>
+            <button class="sidebar-toggle" id="sidebarToggleBtn" title="사이드바 접기/펼치기"><i class="fa-solid fa-chevron-left"></i></button>
           </div>
           <!-- 업무 카테고리 start -->
-          <!-- 기존 메뉴
-          <ul class="category-list">
-            <li class="category-item active" data-category="all">
-              <i class="fa-solid fa-grip"></i>
-              <span>전체 문의</span>
-              <span class="badge">전체</span>
-            </li>
-            <li class="category-item sap-category" data-category="sap_mm">
-              <i class="fa-solid fa-cubes"></i>
-              <span>SAP MM 모듈</span>
-              <span class="badge sap">SAP</span>
-            </li>
-            <li class="category-item" data-category="data">
-              <i class="fa-solid fa-table"></i>
-              <span>Table & T-code</span>
-            </li>
-            <li class="category-item" data-category="system">
-              <i class="fa-solid fa-building-circle-arrow-right"></i>
-              <span>신설법인 프로세스</span>
-              <span class="badge">Netcore,P&M</span>
-            </li>
-            <li class="category-item" data-category="account">
-              <i class="fa-solid fa-server"></i>
-              <span>시스템</span>
-            </li>
-            <li class="category-item" data-category="deploy">
-              <i class="fa-solid fa-network-wired"></i>
-              <span>MM 연동&배치</span>
-            </li>
-            <li class="category-item" data-category="security">
-              <i class="fa-solid fa-address-book"></i>
-              <span>담당자 연락처</span>
-            </li>
-            <li class="category-item" data-category="etc">
-              <i class="fa-solid fa-ellipsis"></i>
-              <span>기타 문의</span>
-            </li>
-          </ul>
-          -->
           <ul class="category-list">
             <li class="category-item active" data-category="all">
               <i class="fa-solid fa-grip"></i>
@@ -241,6 +203,14 @@
               <input type="file" id="fileInput" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.csv,.zip,.ppt,.pptx" style="display:none;" />
               <button class="tool-btn" id="imageAttachBtn" title="스크린샷 첨부"><i class="fa-solid fa-image"></i></button>
               <input type="file" id="imageInput" accept="image/*" style="display:none;" />
+            </div>
+            <div class="quick-suggestions">
+              <button class="suggestion-chip" data-msg="STP 운영 담당부서를 알려주세요"><i class="fa-solid fa-address-book"></i> 담당자 찾기</button>
+              <button class="suggestion-chip" data-msg="STP Table & T-code 알려주세요"><i class="fa-solid fa-table"></i> T-Code 조회</button>
+              <button class="suggestion-chip" data-msg="SAP MM(Material Management) 모듈에 대해 알려주세요"><i class="fa-solid fa-cubes"></i> SAP MM 문의</button>
+              <button class="suggestion-chip" data-msg="MM RFC & 배치에 대해 알려주세요"><i class="fa-solid fa-network-wired"></i> RFC & 배치</button>
+              <button class="suggestion-chip" data-msg="STP에서 업무할 때 주로 사용하는 연계 시스템에 대해서 알려주세요"><i class="fa-solid fa-desktop"></i> 시스템 연계</button>
+              <button class="suggestion-chip" data-msg="신설법인 (Netcore, P&M) 프로세스 알려주세요"><i class="fa-solid fa-building-circle-arrow-right"></i> 업무 프로세스</button>
             </div>
             <div class="input-row">
               <textarea id="userInput" class="chat-input" placeholder="SAP MM 또는 STP 업무 관련 질문을 입력하세요... (Shift+Enter: 줄바꿈, 이미지 Ctrl+V 붙여넣기 가능)" rows="1"></textarea>
@@ -519,14 +489,13 @@
             </div>
           </div>
         </div>
-
+        
         <!-- ===== ZERO GAP BANNER ===== -->
         <div class="guide-zgap">
           <div class="zgap-icon"><i class="fa-solid fa-infinity"></i></div>
           <h3>Zero-Gap 운영 실현</h3>
           <p>그룹사별 상이한 업무 프로세스·매뉴얼·담당자 정보를 하나의 AI로 통합 제공<br>다양한 문의와 업무 지식들을 AI 기반으로 표준화하여 제공하는<strong> 지능형 업무 지원 AI 에이전트입니다.</strong></p>
         </div>
-
       </div>
     </section>
   </main>
