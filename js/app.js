@@ -300,15 +300,13 @@ const hasExcludedCategory = item.closest('[data-category="capability"]') || item
         const welcomeCard = document.querySelector(".welcome-card");
         if (!welcomeCard) return; // Knowledge/교육사이트 화면에서는 스킵
         
-        const welcomeIcon = welcomeCard.querySelector(".welcome-icon i");
+        const welcomeIcon = welcomeCard.querySelector(".welcome-icon .ai-orb");
         const welcomeTitle = welcomeCard.querySelector("h2");
         const welcomeDesc = welcomeCard.querySelector("p");
         const quickBtnsContainer = welcomeCard.querySelector(".quick-btns");
         
         if (welcomeIcon) {
-          welcomeIcon.className = "";
-          void welcomeIcon.offsetWidth;
-          welcomeIcon.className = "fa-solid fa-robot";
+          // AI Orb has its own CSS animation — no JS animation needed
         }
         
         if (welcomeTitle) {
@@ -428,7 +426,7 @@ function showShortcutCards() {
 
        // I/F정의서
        '<a href="https://ktds-kms.atlassian.net/wiki/spaces/ERP/pages/159405193/MM" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
-        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(99,102,241,0.1);margin-bottom:12px;"><i class="fa-solid fa-file-contract" style="font-size:22px;color:#6366f1;"></i></div>' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(59,130,246,0.1);margin-bottom:12px;"><i class="fa-solid fa-file-contract" style="font-size:22px;color:#3B82F6;"></i></div>' +
         '<strong style="font-size:14px;margin-bottom:4px;">I/F정의서</strong>' +
         '<span style="font-size:12px;color:var(--text-secondary);">MM I/F 정의서</span>' +
       '</a>' +
@@ -456,7 +454,7 @@ function showShortcutCards() {
 
       // 프로그램/연동/배치
       '<a href="https://gdrive.kt.co.kr/channel/968/edit?itemIdx=321110" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
-        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(139,92,246,0.1);margin-bottom:12px;"><i class="fa-solid fa-code-branch" style="font-size:22px;color:#8b5cf6;"></i></div>' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(59,130,246,0.1);margin-bottom:12px;"><i class="fa-solid fa-code-branch" style="font-size:22px;color:#3B82F6;"></i></div>' +
         '<strong style="font-size:14px;margin-bottom:4px;">프로그램/연동/배치</strong>' +
         '<span style="font-size:12px;color:var(--text-secondary);">프로그램 및 연동 정보</span>' +
       '</a>' +
@@ -490,7 +488,7 @@ function showWorkSupportCards() {
 
       // 스마트워크 예약
       '<a href="https://srs.ktds.co.kr:8443/front/webFloor.do" target="_blank" rel="noopener noreferrer" style="display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:var(--bg-card);border:1px solid var(--border-color);border-radius:12px;text-align:center;text-decoration:none;color:var(--text-primary);transition:all 0.3s ease;">' +
-        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(139,92,246,0.1);margin-bottom:12px;"><i class="fa-solid fa-computer" style="font-size:22px;color:#8b5cf6;"></i></div>' +
+        '<div style="width:48px;height:48px;display:flex;align-items:center;justify-content:center;border-radius:12px;background:rgba(59,130,246,0.1);margin-bottom:12px;"><i class="fa-solid fa-computer" style="font-size:22px;color:#3B82F6;"></i></div>' +
         '<strong style="font-size:14px;margin-bottom:4px;">스마트워크 예약</strong>' +
         '<span style="font-size:12px;color:var(--text-secondary);">스마트워크 공간 예약</span>' +
       '</a>' +
@@ -723,8 +721,8 @@ function renderDefaultWelcomeCard() {
 
   chatMessages.innerHTML =
     '<div class="welcome-card">' +
-      '<div class="welcome-icon"><i class="fa-solid fa-robot"></i></div>' +
-      '<h2>안녕하세요! STP AI Agent 입니다.</h2>' +
+'<div class="welcome-icon"><div class="ai-orb"></div></div>' +
+'<h2>안녕하세요! STP AI Agent 입니다.</h2>' +
       '<p><strong>SAP MM</strong> 및 <strong>KT DS STP</strong> 업무 관련 문의사항을 자유롭게 질문해 주세요.<br/>구매 프로세스, 자재 관리, 신설법인 프로세스, 계정/권한 등 다양한 업무를 지원합니다.<br/>STP AI 에이전트가 실시간으로 정확한 답변을 제공합니다.</p>' +
       '<div class="quick-btns">' +
         '<button class="quick-btn" data-msg="SAP MM(Material Management) 모듈에 대해 알려주세요"><i class="fa-solid fa-cubes"></i> SAP MM 모듈</button>' +
@@ -994,7 +992,7 @@ function renderKnowledgeHome() {
         '<button class="quick-btn" id="knowledgeUpdateBtn" style="padding:16px;font-size:15px;">' +
           '<i class="fa-solid fa-pen-to-square"></i> 지식 수정' +
         '</button>' +
-        '<button class="quick-btn" id="knowledgeStpAiBtn" style="padding:16px;font-size:15px;grid-column:1 / -1;background:linear-gradient(135deg, var(--kt-red), #c2185b);color:#fff;">' +
+          '<button class="quick-btn" id="knowledgeStpAiBtn" style="padding:16px;font-size:15px;grid-column:1 / -1;background:linear-gradient(135deg, var(--kt-red), var(--kt-red-dark));color:#fff;">' +
           '<i class="fa-solid fa-brain"></i> STP AI Knowledge' +
         '</button>' +
       '</div>' +
@@ -1028,7 +1026,7 @@ function renderStpAiKnowledgeHome() {
 
   chatMessages.innerHTML =
     '<div class="welcome-card" style="max-width:800px;margin:0 auto;">' +
-      '<div class="welcome-icon" style="background:linear-gradient(135deg, var(--kt-red), #c2185b);"><i class="fa-solid fa-brain"></i></div>' +
+      '<div class="welcome-icon" style="background:linear-gradient(135deg, var(--kt-red), var(--kt-red-dark));"><i class="fa-solid fa-brain"></i></div>' +
       '<h2>🧠 STP AI Knowledge</h2>' +
       '<p>STP AI가 학습하는 지식(Dataset)을 직접 관리할 수 있습니다.<br/>문서를 추가하거나 수정하면 AI가 더 정확한 답변을 제공합니다.</p>' +
       '<div style="background:linear-gradient(135deg, rgba(226,0,42,0.1), rgba(194,24,91,0.05));border:1px solid var(--kt-red);border-radius:12px;padding:16px;margin-top:16px;">' +
@@ -4913,7 +4911,7 @@ async function callAIAgent(userText, category) {
   typingRow.className = 'message-row agent';
   typingRow.id = 'typingIndicator';
   typingRow.innerHTML =
-    '<div class="msg-avatar"><i class="fa-solid fa-robot"></i></div>' +
+    '<div class="msg-avatar"><div class="ai-orb"></div></div>' +
     '<div class="msg-content">' +
       '<div class="msg-meta">' +
         '<span class="msg-name">STP AI Agent</span>' +
@@ -5253,7 +5251,7 @@ function createAgentBubble(category) {
 
   const avatar = document.createElement('div');
   avatar.className = 'msg-avatar';
-  avatar.innerHTML = '<i class="fa-solid fa-robot"></i>';
+  avatar.innerHTML = '<div class="ai-orb"></div>';
 
   row.appendChild(avatar);
   row.appendChild(content);
@@ -5265,8 +5263,8 @@ function createAgentBubble(category) {
 
 function buildWelcomeHTML() {
   return '<div class="welcome-card">' +
-    '<div class="welcome-icon"><i class="fa-solid fa-robot"></i></div>' +
-    '<h2>안녕하세요! STP AI Agent 입니다.</h2>' +
+'<div class="welcome-icon"><div class="ai-orb"></div></div>' +
+'<h2>안녕하세요! STP AI Agent 입니다.</h2>' +
     '<p><strong>SAP MM</strong> 및 <strong>KT DS STP</strong> 업무 관련 문의사항을 자유롭게 질문해 주세요.<br/>' +
     '구매 프로세스, 자재 관리, 신설법인 프로세스, 계정/권한 등 다양한 업무를 지원합니다.<br/>' +
     'STP AI 에이전트가 실시간으로 정확한 답변을 제공합니다.</p>' +
