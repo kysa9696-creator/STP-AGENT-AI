@@ -4,7 +4,7 @@
    Dark Theme: Pure Black AI SaaS
     ============================================================ */
 
-/* Custom Alpha Icon - ?�문자 A ?�이�?*/
+/* Custom Alpha Icon */
 .icon-alpha::before {
   content: 'A';
   font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -19,7 +19,7 @@
   text-align: center;
 }
 
-/* Custom KT DS Icon - ?�스??기반 KT DS 로고 */
+/* Custom KT DS Icon  */
 .icon-ktds::before {
   content: 'ds';
   font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
@@ -32,7 +32,7 @@
   display: inline-block;
   width: 1.4em;
   text-align: center;
-  color: #FFFFFF; /* ?�색 */
+  color: #FFFFFF; /*  */
 }
 
 /* ---------- CSS Variables ---------- */
