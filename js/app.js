@@ -4323,6 +4323,24 @@ function bindQuickButtons() {
 bindQuickButtons();
 
 /* ============================================================
+   SUGGESTION CHIPS (빠른 추천 질문)
+   ============================================================ */
+function bindSuggestionChips() {
+  document.querySelectorAll('.suggestion-chip').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      if (!$userInput) return;
+      const msg = chip.dataset.msg || '';
+      $userInput.value = msg;
+      if ($charCount) $charCount.textContent = $userInput.value.length;
+      autoResizeTextarea($userInput);
+      $userInput.focus();
+      handleSend();
+    });
+  });
+}
+bindSuggestionChips();
+
+/* ============================================================
     SEND MESSAGE
     ============================================================ */
 function handleSend() {
@@ -4906,6 +4924,7 @@ async function callAIAgent(userText, category) {
   if ($sendBtn) $sendBtn.disabled = true;
   const agentAvatarEl = document.querySelector('.agent-avatar');
   if (agentAvatarEl) agentAvatarEl.classList.add('agent-pulse');
+  setAIStatus('generating');
 
   const typingRow = document.createElement('div');
   typingRow.className = 'message-row agent';
@@ -4950,6 +4969,7 @@ async function callAIAgent(userText, category) {
       // (Vision 모델이 이미지를 못 볼 경우를 대비해 OCR 텍스트도 쿼리에 포함)
       if (imageAttachments.length > 0) {
         updateTypingText('이미지 업로드 및 OCR 분석 중... (' + imageAttachments.length + '개 이미지)');
+        setAIStatus('analyzing');
         showToast('이미지를 분석 중입니다...', 'info');
 
         // 모든 이미지에 대해 업로드 + OCR 을 병렬로 실행
@@ -5008,6 +5028,7 @@ async function callAIAgent(userText, category) {
       if (docAttachments.length > 0) {
         console.log('[Document Extraction] 텍스트 추출 시작:', docAttachments.length, '개 파일');
         updateTypingText('문서 내용 추출 중... (' + docAttachments.length + '개 파일)');
+        setAIStatus('analyzing');
 
         try {
           extractedText = await extractAllAttachmentsText(docAttachments);
@@ -5108,6 +5129,8 @@ async function callAIAgent(userText, category) {
           state.stats.pending   = Math.max(0, state.stats.pending - 1);
           state.stats.resolved += 1;
           updateStats();
+          
+          // Add confidence badge to answer (removed - not needed)
 
           const conv = state.conversations.find(function(c) { return c.id === state.currentConvId; });
           if (conv) conv.status = 'done';
@@ -5155,6 +5178,7 @@ async function callAIAgent(userText, category) {
     state.isTyping = false;
     if ($sendBtn) $sendBtn.disabled = false;
     if (agentAvatarEl) agentAvatarEl.classList.remove('agent-pulse');
+    setAIStatus('idle');
     scrollBottom();
   }
 }
@@ -5422,6 +5446,25 @@ function updateTypingText(text) {
   }
 }
 
+/* ============================================================
+   AI STATUS INDICATOR
+   ============================================================ */
+function setAIStatus(status) {
+  const agentDesc = document.querySelector('.agent-desc');
+  if (!agentDesc) return;
+
+  const statusMap = {
+    'idle':         { cls: 'status-idle',         icon: '🟢', text: '대기중' },
+    'generating':   { cls: 'status-generating',    icon: '🔵', text: '답변 생성중' },
+    'analyzing':    { cls: 'status-analyzing',     icon: '🟣', text: '문서 분석중' },
+    'searching':    { cls: 'status-searching',     icon: '🟡', text: 'Knowledge 검색중' }
+  };
+
+  const s = statusMap[status] || statusMap['idle'];
+  agentDesc.className = 'agent-desc ' + s.cls;
+  agentDesc.innerHTML = s.icon + ' ' + s.text + ' &nbsp;·&nbsp; <i class="fa-solid fa-microchip" style="color:var(--kt-red)"></i> 오늘도 당신을 응원합니다!';
+}
+
 function autoResizeTextarea(el) {
   if (!el) return;
   el.style.height = 'auto';
@@ -5619,6 +5662,18 @@ document.addEventListener('DOMContentLoaded', function() {
   updateCharCount();
   renderAttachments();
   updateStats();
+  setAIStatus('idle');
+
+  /* ============================================================
+     SIDEBAR TOGGLE
+     ============================================================ */
+  const sidebarToggleBtn = document.getElementById('sidebarToggleBtn');
+  const sidebar = document.getElementById('sidebar');
+  if (sidebarToggleBtn && sidebar) {
+    sidebarToggleBtn.addEventListener('click', function() {
+      sidebar.classList.toggle('collapsed');
+    });
+  }
   
   // 모달 이벤트 리스너 설정
   const closePreviewBtn = document.getElementById('closePreviewBtn');
@@ -5628,11 +5683,9 @@ document.addEventListener('DOMContentLoaded', function() {
   if (closePreviewBtn) {
     closePreviewBtn.addEventListener('click', hideExtractPreview);
   }
-  
   if (copyTextBtn) {
     copyTextBtn.addEventListener('click', copyExtractedText);
   }
-  
   if (applyTextBtn) {
     applyTextBtn.addEventListener('click', applyExtractedText);
   }
