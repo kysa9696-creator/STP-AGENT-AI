@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>KT DS STP AI Agent</title>
-  <link rel="stylesheet" href="css/style.css" />
+  <link rel="stylesheet" href="css/style.css?v=2.1.5" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet"/>
 </head>
@@ -13,7 +13,6 @@
   <header class="header">
     <div class="header-inner">
       <div class="logo-area">
-        <div class="logo-icon"><div class="ai-orb"></div></div>
         <div class="logo-text">
           <span class="logo-main">KT DS</span>
           <span class="logo-sub">STP AI Agent</span>
@@ -47,6 +46,45 @@
             <button class="sidebar-toggle" id="sidebarToggleBtn" title="사이드바 접기/펼치기"><i class="fa-solid fa-chevron-left"></i></button>
           </div>
           <!-- 업무 카테고리 start -->
+          <!-- 기존 메뉴
+          <ul class="category-list">
+            <li class="category-item active" data-category="all">
+              <i class="fa-solid fa-grip"></i>
+              <span>전체 문의</span>
+              <span class="badge">전체</span>
+            </li>
+            <li class="category-item sap-category" data-category="sap_mm">
+              <i class="fa-solid fa-cubes"></i>
+              <span>SAP MM 모듈</span>
+              <span class="badge sap">SAP</span>
+            </li>
+            <li class="category-item" data-category="data">
+              <i class="fa-solid fa-table"></i>
+              <span>Table & T-code</span>
+            </li>
+            <li class="category-item" data-category="system">
+              <i class="fa-solid fa-building-circle-arrow-right"></i>
+              <span>신설법인 프로세스</span>
+              <span class="badge">Netcore,P&M</span>
+            </li>
+            <li class="category-item" data-category="account">
+              <i class="fa-solid fa-server"></i>
+              <span>시스템</span>
+            </li>
+            <li class="category-item" data-category="deploy">
+              <i class="fa-solid fa-network-wired"></i>
+              <span>MM 연동&배치</span>
+            </li>
+            <li class="category-item" data-category="security">
+              <i class="fa-solid fa-address-book"></i>
+              <span>담당자 연락처</span>
+            </li>
+            <li class="category-item" data-category="etc">
+              <i class="fa-solid fa-ellipsis"></i>
+              <span>기타 문의</span>
+            </li>
+          </ul>
+          -->
           <ul class="category-list">
             <li class="category-item active" data-category="all">
               <i class="fa-solid fa-grip"></i>
@@ -67,42 +105,56 @@
               <ul class="tree-menu">
                 <li class="tree-item group-company" data-company="netcore-pm" data-category="netcore-pm">
                   <div class="tree-title">
-                    <span>kt netcore | kt p&m</span>
+                    <i class="fa-solid fa-building-circle-arrow-right"></i>
+                    <span>KT netcore</span>
+                  </div>
+                </li>
+                <li class="tree-item group-company" data-company="kt-group" data-category="kt-group">
+                  <div class="tree-title">
+                    <i class="icon-kt-group"></i>
+                    <span>KT </span>
                   </div>
                 </li>
                 <li class="tree-item group-company" data-company="cloud" data-category="cloud">
                   <div class="tree-title">
-                    <span>kt cloud</span>
+                    <i class="fa-solid fa-cloud"></i>
+                    <span>KT cloud</span>
                   </div>
                 </li>
                 <li class="tree-item group-company" data-company="alpha" data-category="alpha">
                   <div class="tree-title">
-                    <span>kt alpha</span>
+                    <i class="icon-alpha"></i>
+                    <span>KT alpha</span>
                   </div>
                 </li>
                 <li class="tree-item group-company" data-company="skylife">
                   <div class="tree-title">
-                    <span>kt skylife</span>
+                    <i class="fa-solid fa-satellite-dish"></i>
+                    <span>KT skylife</span>
                   </div>
                 </li>
                 <li class="tree-item group-company" data-company="sat">
                   <div class="tree-title">
-                    <span>kt sat</span>
+                    <i class="fa-solid fa-satellite"></i>
+                    <span>KT sat</span>
                   </div>
                 </li>
                 <li class="tree-item group-company" data-company="ds">
                   <div class="tree-title">
-                    <span>kt ds</span>
+                    <i class="fa-solid fa-people-group"></i>
+                    <span>KT ds</span>
                   </div>
                 </li>
                 <li class="tree-item group-company" data-company="estate">
                   <div class="tree-title">
-                    <span>kt estate</span>
+                    <i class="fa-solid fa-house"></i>
+                    <span>KT estate</span>
                   </div>
                 </li>
                 <li class="tree-item group-company" data-company="engineering">
                   <div class="tree-title">
-                    <span>kt engineering</span>
+                    <i class="fa-solid fa-gears"></i>
+                    <span>KT engineering</span>
                   </div>
                 </li>
               </ul>
@@ -489,13 +541,14 @@
             </div>
           </div>
         </div>
-        
+
         <!-- ===== ZERO GAP BANNER ===== -->
         <div class="guide-zgap">
           <div class="zgap-icon"><i class="fa-solid fa-infinity"></i></div>
           <h3>Zero-Gap 운영 실현</h3>
           <p>그룹사별 상이한 업무 프로세스·매뉴얼·담당자 정보를 하나의 AI로 통합 제공<br>다양한 문의와 업무 지식들을 AI 기반으로 표준화하여 제공하는<strong> 지능형 업무 지원 AI 에이전트입니다.</strong></p>
         </div>
+
       </div>
     </section>
   </main>
@@ -543,6 +596,6 @@
   <!-- Document Text Extraction Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
-  <script src="js/app.js?v=2.0.5"></script>
+  <script src="js/app.js?v=2.1.4"></script>
 </body>
 </html>
