@@ -105,9 +105,23 @@ const KEYWORD_MAP = {
 function detectCategory(text) {
   const lower = text.toLowerCase();
   
-  // 담당자/연락처 키워드가 포함되면 무조건 security 카테고리로 우선 처리
-  const contactKeywords = ['담당자'];
-  if (contactKeywords.some(function(kw) { return lower.includes(kw); })) {
+  // Table/T-Code 관련 질문은 data 카테고리로 우선 처리
+  if (isTableTcodeQuery(text)) {
+    return 'data';
+  }
+  
+  // RFC/배치 관련 질문
+  if (isDeployProcessQuery(text)) {
+    return 'deploy';
+  }
+  
+  // 신설법인 프로세스 관련 질문
+  if (isNewCompanyQuery(text)) {
+    return 'system';
+  }
+  
+  // 담당자/연락처 키워드가 포함되면 security 카테고리로 처리 (명시적 담당자 의도만)
+  if (isContactQuery(text)) {
     return 'security';
   }
   
@@ -236,9 +250,10 @@ document.addEventListener("DOMContentLoaded", () => {
         else if (companyName === "alpha") iconClass = "icon-alpha";
         else if (companyName === "skylife") iconClass = "fa-solid fa-satellite-dish";
         else if (companyName === "sat") iconClass = "fa-solid fa-satellite";
-        else if (companyName === "ds") iconClass = "icon-ktds";
+        else if (companyName === "ds") iconClass = "fa-solid fa-people-group";
         else if (companyName === "estate") iconClass = "fa-solid fa-house";
-        else if (companyName === "engcore") iconClass = "fa-solid fa-gears";
+        else if (companyName === "engineering") iconClass = "fa-solid fa-gears";
+        else if (companyName === "kt-group") iconClass = "icon-kt-group";
         
         // chat messages 완전 clear 후 새로운 welcome 카드 생성
         const chatMessages = document.getElementById("chatMessages");
@@ -252,12 +267,14 @@ document.addEventListener("DOMContentLoaded", () => {
             chatMessages.dataset.currentCategory = "cloud";
           } else if (companyName === "skylife") {
             chatMessages.dataset.currentCategory = "skylife";
+          } else if (companyName === "kt-group") {
+            chatMessages.dataset.currentCategory = "kt-group";
           }
           
           // netcore-pm 의 경우 신설법인 프로세스 버튼으로 변경
           if (companyName === "netcore-pm") {
             chatMessages.innerHTML = 
-              '<div class="welcome-card">' +
+              '<div class="welcome-card" data-company="' + companyName + '">' +
                 '<div class="welcome-icon"><i class="' + iconClass + '"></i></div>' +
                 '<h2>' + companyLabel + ' - STP AI Agent</h2>' +
                 '<p><strong>' + companyLabel + '</strong> 관련 문의사항을 자유롭게 질문해 주세요.<br/>신설법인 프로세스, 시스템 연동, RFC & 배치, 담당자 연락처 등 다양한 정보를 지원합니다.<br/>STP AI 에이전트가 실시간으로 정확한 답변을 제공합니다.</p>' +
@@ -270,7 +287,7 @@ document.addEventListener("DOMContentLoaded", () => {
               '</div>';
           } else {
             chatMessages.innerHTML = 
-              '<div class="welcome-card">' +
+              '<div class="welcome-card" data-company="' + companyName + '">' +
                 '<div class="welcome-icon"><i class="' + iconClass + '"></i></div>' +
                 '<h2>' + companyLabel + ' - STP AI Agent</h2>' +
                 '<p><strong>' + companyLabel + '</strong> 관련 문의사항을 자유롭게 질문해 주세요.<br/>업무 프로세스, Table & T-code, RFC & 배치, 담당자 연락처 등 다양한 정보를 지원합니다.<br/>STP AI 에이전트가 실시간으로 정확한 답변을 제공합니다.</p>' +
@@ -2761,9 +2778,17 @@ function buildSystemAnswer(systemType) {
 }
 
 /* ============================================================
-    STP Table & T-code 키워드 감지 및 즉시 응답
+    Table & T-code 키워드 감지 및 즉시 응답 (회사명 무관)
     ============================================================ */
-const TABLE_TCODE_KEYWORDS = [ 'STP Table', 'STP 테이블', 'stp table', 'STP T-Code', 'STP 티코드', 'STP TCode', 'stp tcode' ];
+const TABLE_TCODE_KEYWORDS = [
+  // 기존 STP 키워드
+  'STP Table', 'STP 테이블', 'stp table', 'STP T-Code', 'STP 티코드', 'STP TCode', 'stp tcode',
+  // 회사명 무관 키워드 (Table/T-Code 관련)
+  'table & t-code', 'table & tcode', 'table&t-code', 'table&tcode', 'table t-code', 'table tcode',
+  't-code', 'tcode', '티코드', '테이블',
+  '관련 테이블', '관련 table', '테이블 알려', 'table 알려', 't-code 알려', 'tcode 알려',
+  'tables', 'tcodes'
+];
 
 function isTableTcodeQuery(text) {
   const lowerText = text.toLowerCase().trim();
@@ -2774,115 +2799,287 @@ function isTableTcodeQuery(text) {
     return false;
   }
   
+  // 담당자/연락처 키워드가 포함되면 Table & T-code가 아님
+  const contactKeywords = ['담당자', '연락처', '담당부서', '담당자 알려', '연락처 알려'];
+  if (contactKeywords.some(function(kw) { return lowerText.includes(kw); })) {
+    return false;
+  }
+  
   return TABLE_TCODE_KEYWORDS.some(function(kw) { return lowerText.includes(kw.toLowerCase()); });
 }
 
-function buildTableTcodeAnswer() {
-  const tableTcodeAnswer =
-    '<strong>📋 STP Table & T-Code 가이드</strong><br/><br/>' +
-    
+// Table/T-Code 질문에서 회사명 추출
+function extractCompanyFromTableTcodeQuery(text) {
+  const lowerText = text.toLowerCase();
+  if (lowerText.includes('kt cloud') || lowerText.includes('ktcloud') || lowerText.includes('클라우드')) return 'cloud';
+  if (lowerText.includes('kt skylife') || lowerText.includes('ktskylife') || lowerText.includes('스카이라이프') || lowerText.includes('skylife')) return 'skylife';
+  if (lowerText.includes('kt alpha') || lowerText.includes('ktalpha') || lowerText.includes('알파') || lowerText.includes('alpha')) return 'alpha';
+  if (lowerText.includes('kt sat') || lowerText.includes('ktsat') || lowerText.includes('sat')) return 'sat';
+  if (lowerText.includes('kt ds') || lowerText.includes('ktds') || lowerText.includes('ds')) return 'ds';
+  if (lowerText.includes('kt estate') || lowerText.includes('ktestate') || lowerText.includes('estate')) return 'estate';
+  if (lowerText.includes('netcore') || lowerText.includes('p&m') || lowerText.includes('신설법인')) return 'netcore-pm';
+  if (lowerText.includes('stp')) return 'stp';
+  return null;
+}
+
+/* ============================================================
+    Unknown Intent Detection
+    ============================================================ */
+function isUnknownIntent(text) {
+  // 빈 텍스트는 제외
+  if (!text || text.trim().length < 2) return false;
+  
+  // 이미 다른 Intent로 처리된 경우는 제외 (handleSend 순서상 여기까지 오면 처리되지 않은 것)
+  // 하지만 DIFY로 보내기 전에 명확히 알 수 없는 질문인지 확인
+  
+  // 매우 짧은 질문(2자 미만)은 Unknown으로 처리하지 않고 DIFY로 넘김
+  if (text.trim().length < 3) return false;
+  
+  // Known keyword가 하나도 없는 경우 → Unknown
+  var allKnownKeywords = [
+    // SAP/MM
+    'sap', 'mm', 'po', 'pr', 'migo', 'miro', 'me21', 'me51', 'mm01', 'mmbe', 'mb51',
+    '구매', '발주', '입고', '자재', 'invoice', '인보이스',
+    // 신설법인
+    '신설법인', 'netcore', 'p&m', '법인', '신설', '프로세스', '계약', '지출결의',
+    '기성', '준공', 'dip', 'bpm', 'srm', 'erp', 'ses', '송장', '지급',
+    // 계정
+    '계정', '비밀번호', '패스워드', '권한', '로그인', '잠금', '인증', 'account', '접근', '승인',
+    // 네트워크
+    '네트워크', 'vpn', 'ip', 'dns', '방화벽', '포트', '연결', 'ping', '접속', '통신', 'network',
+    // 연동/배치
+    '연동', '배치', 'material management', '자재 연동', '구매 연동', '입고 연동', '출고 연동',
+    'MIGO', 'MIRO', 'ME21', 'ME22', 'ME23', '자재 마스터', '物料管理', '配着', 'J-FLOW',
+    // 담당자
+    '담당자', '연락처', '담당부서', '알파', 'alpha',
+    // Table/T-Code
+    'table', 't-code', 'tcode', '티코드', '테이블',
+    // PO 조회
+    '2008-', '2009-', '2010-', '구매오더', '발주서',
+    // 시스템
+    '시스템', '연계', 'stp',
+    // RFC
+    'rfc', 'zsbmm', 'zsha', 'zevrr',
+    // Error
+    '에러', 'error', '오류', 'exception', '실패', '잘못된', '안 되는'
+  ];
+  
+  var lowerText = text.toLowerCase();
+  var hasAnyKeyword = allKnownKeywords.some(function(kw) { return lowerText.includes(kw); });
+  
+  // Known keyword가 하나도 없고, 질문 형식도 아닌 경우 → Unknown
+  if (!hasAnyKeyword) {
+    // "?" 또는 "어떻게", "어떤", "어디" 등의 질문 형식은 DIFY로 넘김
+    var questionPatterns = ['?', '어떻게', '어떤', '어디', '왜', '누구', '무엇', '어느', 'how', 'what', 'where', 'why', 'who'];
+    var isQuestion = questionPatterns.some(function(p) { return lowerText.includes(p); });
+    if (!isQuestion) return true;
+  }
+  
+  return false;
+}
+
+/* ============================================================
+    Company Table & T-Code Data Registry
+    ============================================================ */
+const COMPANY_TABLE_TCODE_DATA = {
+  stp: {
+    name: 'STP',
+    tcodes: [
+      { category: 'I/F', code: 'ZSBMMTE9003', desc: 'I/F 모니터링 - 신설법인' },
+      { category: 'I/F', code: 'ZSBMMTE0170', desc: 'Interface 재처리 프로그램' },
+      { category: 'I/F', code: 'ZSHAE0300', desc: '덤프 현행관리' },
+      { category: 'I/F', code: 'ZSHAE0500', desc: '배치잡현행관리' },
+      { category: '공통코드', code: 'ZSBMMTC0040', desc: '공통코드관리' },
+      { category: 'DIP', code: 'ZSBMMTE01902', desc: 'DIP 요청관리' },
+      { category: 'DIP', code: 'ZSBMMTE019021', desc: 'DIP 변경계약' },
+      { category: 'DIP', code: 'ZSBMMTE019061', desc: 'DIP 공사 총액계약 생성' },
+      { category: 'DIP', code: 'ZSBMMTE019062', desc: 'DIP 용역 총액계약 생성' },
+      { category: 'DIP', code: 'ZSBMMTE019032', desc: 'DIP 용역 단가계약 (렌탈) 생성' },
+      { category: 'DIP', code: 'ZSBMMTE0350', desc: '용역 단가 (렌탈) 정산요청 프로그램' },
+      { category: 'PR', code: 'ZSBMMTW0010', desc: '구매요청 (PR) 결재 요청' },
+      { category: 'PO', code: 'ZSBMMTE0340', desc: 'SRM 사업자 변경 계약 건에 대한 구매문서 생성/변경' },
+      { category: 'SES(기성)', code: 'ML81N', desc: '서비스 입력 시트' },
+      { category: 'SES(기성)', code: 'ZSBMMTE0220', desc: '미처리 내역 확인 및 처리' },
+      { category: 'SES(기성)', code: 'ZSBMMTE0600', desc: '선금/차감금 전표 생성' },
+      { category: 'IV', code: 'ZEVRR0050', desc: '지출결의 생성' },
+      { category: 'IV', code: 'ZSBMMTW0030', desc: '지출결의 결재 요청' },
+      { category: 'IV', code: 'ZSBMMTE0090', desc: '지체상금 송장처리' },
+      { category: 'IV', code: 'ZEVRR0030', desc: '[EVR] 전자 (세금) 계산서 모니터링 (STP)' },
+      { category: 'Report', code: 'ZSBMMTR0110', desc: '구매 상세내역 리포트' },
+      { category: 'Report', code: 'ZSBMMTR0040N', desc: 'My 구매요청 조회' },
+      { category: 'Report', code: 'ZSBMMTR0100', desc: '지출결의 상세내역 리포트' }
+    ],
+    tables: [
+      { category: 'I/F', code: 'ZTSBMMT0500', name: '[STP 모듈 공통] I/F 로그 관리 테이블', desc: '' },
+      { category: 'ATACAMA', code: 'ZTSBMMT0090', name: 'DSS 설계 구매요청 DATA 관리 HEADER', desc: '최초 계약 데이터 (현재 설계 테이블)' },
+      { category: 'ATACAMA', code: 'ZTSBMMT0091', name: 'DSS 설계 구매요청 DATA 관리 ITEM', desc: '' },
+      { category: 'ATACAMA', code: 'ZTSBMMT0090I', name: 'DIP Head Interface 정보', desc: 'ATACAM 이력 테이블 (히스토리)' },
+      { category: 'ATACAMA', code: 'ZTSBMMT0091I', name: 'DIP Item Interface log', desc: '' },
+      { category: 'ATACAMA', code: 'ZTSBMMT0090H', name: 'DIP Interface Head History', desc: '변경계약 전 이전 차수 설계 테이블' },
+      { category: 'ATACAMA', code: 'ZTSBMMT0091H', name: 'DIP Interface Item History', desc: '' },
+      { category: 'DIP', code: 'ZTSBMMT0092', name: 'DIP 헤더', desc: '' },
+      { category: 'DIP', code: 'ZTSBMMT0093', name: 'DIP 품목', desc: '' },
+      { category: 'DIP', code: 'ZTSBMMT0092H', name: 'DIP Request Head History', desc: '' },
+      { category: 'DIP', code: 'ZTSBMMT0093H', name: 'DIP Request Item History', desc: '' },
+      { category: 'BPM', code: 'ZTSBMMT0220', name: '[STP]BPM(결재) 수신 Log', desc: 'BPM 모든 이력 테이블 (MM)' },
+      { category: 'BPM', code: 'ZTSHA1000', name: 'BPM 전자결재 수신 Log', desc: 'BPM 모든 연동 테이블' },
+      { category: 'BPM', code: 'ZTSHA1001', name: 'BPM 전자결재 수신 Process 별 RFC Mapping', desc: 'BPM 유형' },
+      { category: 'SRM', code: 'ZTSBMMT0531', name: 'SRM 계약진행상태 전송 이력 저장 아이템', desc: '' },
+      { category: 'SRM', code: 'ZTSBMMT0040', name: 'SRM 협력사 정보', desc: '' },
+      { category: 'SRM', code: 'ZTSBMMT0560', name: 'ERP 협력사 생성 및 변경 Log(ERP TO SRM)', desc: '' },
+      { category: 'SRM', code: 'ZTSBMMT0630', name: '사업자 변경 CBO 테이블', desc: '' },
+      { category: 'PR', code: 'EBAN', name: '구매 요청', desc: 'EBAN 데이터 가지고 SRM 에 호출' },
+      { category: 'PR', code: 'EBKN', name: '구매요청 계정지정', desc: '' },
+      { category: 'PO', code: 'EKKO', name: '구매문서헤더', desc: '' },
+      { category: 'PO', code: 'EKPO', name: '구매문서품목', desc: '' },
+      { category: 'PO', code: 'EKBE', name: '구매 오더 이력', desc: '' },
+      { category: 'PO', code: 'EKKN', name: '구매 문서의 계정 지정', desc: '' },
+      { category: 'PO', code: 'ZTSBMMT0120', name: 'SRM I/F PO 생성정보 헤더', desc: '최초계약 (SRM -> SAP)' },
+      { category: 'PO', code: 'ZTSBMMT0121', name: 'SRM I/F PO 생성정보 아이템', desc: '최초계약 (SRM -> SAP)' },
+      { category: 'PO', code: 'ZTSBMMT0350', name: 'SRM Interface 계약/구매오더 생성/변경 Log 헤더', desc: '변경계약 (SRM -> SAP), 사업자변경계약' },
+      { category: 'PO', code: 'ZTSBMMT0351', name: 'SRM Interface 계약/구매오더 생성/변경 Log 품목', desc: '변경계약 (SRM -> SAP), 사업자변경계약' },
+      { category: '선급금', code: 'ZTSBMMT0540', name: '선급금 I/F 수신 데이터 이력 저장', desc: '' },
+      { category: 'SES(기성)', code: 'ZTSBMMT0510', name: 'SES 생성 SRM I/F 수신 데이터 이력 저장 헤더', desc: '' },
+      { category: 'SES(기성)', code: 'ZTSBMMT0511', name: 'SES 생성 SRM I/F 수신 데이터 이력 저장 아이템', desc: '' },
+      { category: 'SES(기성)', code: 'ESSR', name: '서비스 입력시 헤더데이터', desc: '' },
+      { category: '자재문서', code: 'MKPF', name: '자재전표 헤더', desc: '' },
+      { category: '자재문서', code: 'MSEG', name: '자재전표 품목', desc: '' },
+      { category: 'IV', code: 'ZTEVR0030', name: '[EVR] 전자세금계산서 AR 데이터 Header 테이블', desc: '' },
+      { category: 'IV', code: 'ZTEVR0050', name: '[EVR] 전자세금계산서 AP 상태관리 Log', desc: '세금계산서 이력' },
+      { category: 'IV', code: 'ZTEVR0060', name: '[EVR] 전자세금계산서 AP 상태관리 Header', desc: '세금계산서 헤더' },
+      { category: 'IV', code: 'ZTEVR0070', name: '[EVR] 전자세금계산서 AP 데이터 Header 테이블', desc: '세금계산서 아이템' },
+      { category: 'IV', code: 'ZTSBMMT0230', name: '[STP] 협력사 임시송장 결재 상세 내역', desc: '' },
+      { category: 'IV', code: 'RBKP', name: '송장 헤더', desc: '' },
+      { category: 'IV', code: 'RSEG', name: '송장 품목', desc: '' },
+      { category: 'FI', code: 'BKPF', name: '회계전표 헤더', desc: '' },
+      { category: 'FI', code: 'BSEG', name: '회계전표 품목', desc: '' }
+    ]
+  },
+  cloud: { name: 'KT Cloud', tcodes: [], tables: [] },
+  skylife: { name: 'KT Skylife', tcodes: [], tables: [] },
+  alpha: { name: 'KT Alpha', tcodes: [], tables: [] },
+  sat: { name: 'KT SAT', tcodes: [], tables: [] },
+  ds: { name: 'KT DS', tcodes: [], tables: [] },
+  estate: { name: 'KT Estate', tcodes: [], tables: [] },
+  'netcore-pm': { name: 'KT Netcore / P&M', tcodes: [], tables: [] }
+};
+
+function getCompanyName(companyKey) {
+  if (COMPANY_TABLE_TCODE_DATA[companyKey]) return COMPANY_TABLE_TCODE_DATA[companyKey].name;
+  return companyKey;
+}
+
+function buildTcodeTableHtml(tcodes) {
+  if (!tcodes || tcodes.length === 0) return '';
+  var html =
     '<h4 style="color:#333333;margin:16px 0 10px 0;font-size:15px;font-weight:700;">🔧 주요 T-Code 목록</h4>' +
-    
     '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">' +
-      '<thead>' +
-        '<tr style="background:linear-gradient(135deg, #6B9AC4, #5A8AB5);color:#fff;">' +
-          '<th style="padding:10px;border-radius:4px 0 0 0;">구분</th>' +
-          '<th style="padding:10px;">T-Code</th>' +
-          '<th style="padding:10px;border-radius:0 4px 0 0;">내역</th>' +
-        '</tr>' +
-      '</thead>' +
-      '<tbody>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>I/F</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:var(--code-font, Consolas, Monaco, monospace);font-weight:600;">ZSBMMTE9003</td><td style="padding:8px;border:1px solid var(--border-color);">I/F 모니터링 - 신설법인</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>I/F</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE0170</td><td style="padding:8px;border:1px solid var(--border-color);">Interface 재처리 프로그램</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>I/F</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSHAE0300</td><td style="padding:8px;border:1px solid var(--border-color);">덤프 현행관리</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>I/F</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSHAE0500</td><td style="padding:8px;border:1px solid var(--border-color);">배치잡현행관리</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>공통코드</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTC0040</td><td style="padding:8px;border:1px solid var(--border-color);">공통코드관리</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE01902</td><td style="padding:8px;border:1px solid var(--border-color);">DIP 요청관리</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE019021</td><td style="padding:8px;border:1px solid var(--border-color);">DIP 변경계약</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE019061</td><td style="padding:8px;border:1px solid var(--border-color);">DIP 공사 총액계약 생성</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE019062</td><td style="padding:8px;border:1px solid var(--border-color);">DIP 용역 총액계약 생성</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE019032</td><td style="padding:8px;border:1px solid var(--border-color);">DIP 용역 단가계약 (렌탈) 생성</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE0350</td><td style="padding:8px;border:1px solid var(--border-color);">용역 단가 (렌탈) 정산요청 프로그램</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PR</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTW0010</td><td style="padding:8px;border:1px solid var(--border-color);">구매요청 (PR) 결재 요청</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PO</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE0340</td><td style="padding:8px;border:1px solid var(--border-color);">SRM 사업자 변경 계약 건에 대한 구매문서 생성/변경</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SES(기성)</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ML81N</td><td style="padding:8px;border:1px solid var(--border-color);">서비스 입력 시트</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SES(기성)</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE0220</td><td style="padding:8px;border:1px solid var(--border-color);">미처리 내역 확인 및 처리</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SES(기성)</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE0600</td><td style="padding:8px;border:1px solid var(--border-color);">선금/차감금 전표 생성</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZEVRR0050</td><td style="padding:8px;border:1px solid var(--border-color);">지출결의 생성</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTW0030</td><td style="padding:8px;border:1px solid var(--border-color);">지출결의 결재 요청</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTE0090</td><td style="padding:8px;border:1px solid var(--border-color);">지체상금 송장처리</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZEVRR0030</td><td style="padding:8px;border:1px solid var(--border-color);">[EVR] 전자 (세금) 계산서 모니터링 (STP)</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>Report</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTR0110</td><td style="padding:8px;border:1px solid var(--border-color);">구매 상세내역 리포트</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>Report</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTR0040N</td><td style="padding:8px;border:1px solid var(--border-color);">My 구매요청 조회</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>Report</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZSBMMTR0100</td><td style="padding:8px;border:1px solid var(--border-color);">지출결의 상세내역 리포트</td></tr>' +
-      '</tbody>' +
-    '</table>' +
-    
+    '<thead><tr style="background:linear-gradient(135deg, #6B9AC4, #5A8AB5);color:#fff;">' +
+    '<th style="padding:10px;border-radius:4px 0 0 0;">구분</th>' +
+    '<th style="padding:10px;">T-Code</th>' +
+    '<th style="padding:10px;border-radius:0 4px 0 0;">내역</th></tr></thead><tbody>';
+  for (var i = 0; i < tcodes.length; i++) {
+    var bg = i % 2 === 0 ? 'var(--bg-secondary)' : 'var(--bg-card)';
+    html += '<tr style="background:' + bg + ';">' +
+      '<td style="padding:8px;border:1px solid var(--border-color);"><strong>' + tcodes[i].category + '</strong></td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">' + tcodes[i].code + '</td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);">' + tcodes[i].desc + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildTableListHtml(tables) {
+  if (!tables || tables.length === 0) return '';
+  var html =
     '<h4 style="color:#333333;margin:16px 0 10px 0;font-size:15px;font-weight:700;">💾 주요 Table 목록</h4>' +
-    
     '<table style="width:100%;border-collapse:collapse;font-size:13px;">' +
-      '<thead>' +
-        '<tr style="background:linear-gradient(135deg, #6B9AC4, #5A8AB5);color:#fff;">' +
-          '<th style="padding:10px;border-radius:4px 0 0 0;">구분</th>' +
-          '<th style="padding:10px;">테이블</th>' +
-          '<th style="padding:10px;">테이블명</th>' +
-          '<th style="padding:10px;border-radius:0 4px 0 0;">설명</th>' +
-        '</tr>' +
-      '</thead>' +
-      '<tbody>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>I/F</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0500</td><td style="padding:8px;border:1px solid var(--border-color);">[STP 모듈 공통] I/F 로그 관리 테이블</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>ATACAMA</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0090</td><td style="padding:8px;border:1px solid var(--border-color);">DSS 설계 구매요청 DATA 관리 HEADER</td><td style="padding:8px;border:1px solid var(--border-color);">최초 계약 데이터 (현재 설계 테이블)</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>ATACAMA</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0091</td><td style="padding:8px;border:1px solid var(--border-color);">DSS 설계 구매요청 DATA 관리 ITEM</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>ATACAMA</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0090I</td><td style="padding:8px;border:1px solid var(--border-color);">DIP Head Interface 정보</td><td style="padding:8px;border:1px solid var(--border-color);">ATACAM 이력 테이블 (히스토리)</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>ATACAMA</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0091I</td><td style="padding:8px;border:1px solid var(--border-color);">DIP Item Interface log</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>ATACAMA</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0090H</td><td style="padding:8px;border:1px solid var(--border-color);">DIP Interface Head History</td><td style="padding:8px;border:1px solid var(--border-color);">변경계약 전 이전 차수 설계 테이블</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>ATACAMA</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0091H</td><td style="padding:8px;border:1px solid var(--border-color);">DIP Interface Item History</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0092</td><td style="padding:8px;border:1px solid var(--border-color);">DIP 헤더</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0093</td><td style="padding:8px;border:1px solid var(--border-color);">DIP 품목</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0092H</td><td style="padding:8px;border:1px solid var(--border-color);">DIP Request Head History</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>DIP</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0093H</td><td style="padding:8px;border:1px solid var(--border-color);">DIP Request Item History</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>BPM</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0220</td><td style="padding:8px;border:1px solid var(--border-color);">[STP]BPM(결재) 수신 Log</td><td style="padding:8px;border:1px solid var(--border-color);">BPM 모든 이력 테이블 (MM)</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>BPM</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSHA1000</td><td style="padding:8px;border:1px solid var(--border-color);">BPM 전자결재 수신 Log</td><td style="padding:8px;border:1px solid var(--border-color);">BPM 모든 연동 테이블</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>BPM</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSHA1001</td><td style="padding:8px;border:1px solid var(--border-color);">BPM 전자결재 수신 Process 별 RFC Mapping</td><td style="padding:8px;border:1px solid var(--border-color);">BPM 유형</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SRM</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0531</td><td style="padding:8px;border:1px solid var(--border-color);">SRM 계약진행상태 전송 이력 저장 아이템</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SRM</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0040</td><td style="padding:8px;border:1px solid var(--border-color);">SRM 협력사 정보</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SRM</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0560</td><td style="padding:8px;border:1px solid var(--border-color);">ERP 협력사 생성 및 변경 Log(ERP TO SRM)</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SRM</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0630</td><td style="padding:8px;border:1px solid var(--border-color);">사업자 변경 CBO 테이블</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PR</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">EBAN</td><td style="padding:8px;border:1px solid var(--border-color);">구매 요청</td><td style="padding:8px;border:1px solid var(--border-color);">EBAN 데이터 가지고 SRM 에 호출</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PR</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">EBKN</td><td style="padding:8px;border:1px solid var(--border-color);">구매요청 계정지정</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PO</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">EKKO</td><td style="padding:8px;border:1px solid var(--border-color);">구매문서헤더</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PO</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">EKPO</td><td style="padding:8px;border:1px solid var(--border-color);">구매문서품목</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PO</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">EKBE</td><td style="padding:8px;border:1px solid var(--border-color);">구매 오더 이력</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PO</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">EKKN</td><td style="padding:8px;border:1px solid var(--border-color);">구매 문서의 계정 지정</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PO</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0120</td><td style="padding:8px;border:1px solid var(--border-color);">SRM I/F PO 생성정보 헤더</td><td style="padding:8px;border:1px solid var(--border-color);">최초계약 (SRM -> SAP)</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PO</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0121</td><td style="padding:8px;border:1px solid var(--border-color);">SRM I/F PO 생성정보 아이템</td><td style="padding:8px;border:1px solid var(--border-color);">최초계약 (SRM -> SAP)</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PO</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0350</td><td style="padding:8px;border:1px solid var(--border-color);">SRM Interface 계약/구매오더 생성/변경 Log 헤더</td><td style="padding:8px;border:1px solid var(--border-color);">변경계약 (SRM -> SAP), 사업자변경계약</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>PO</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0351</td><td style="padding:8px;border:1px solid var(--border-color);">SRM Interface 계약/구매오더 생성/변경 Log 품목</td><td style="padding:8px;border:1px solid var(--border-color);">변경계약 (SRM -> SAP), 사업자변경계약</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>선급금</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0540</td><td style="padding:8px;border:1px solid var(--border-color);">선급금 I/F 수신 데이터 이력 저장</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SES(기성)</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0510</td><td style="padding:8px;border:1px solid var(--border-color);">SES 생성 SRM I/F 수신 데이터 이력 저장 헤더</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SES(기성)</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0511</td><td style="padding:8px;border:1px solid var(--border-color);">SES 생성 SRM I/F 수신 데이터 이력 저장 아이템</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>SES(기성)</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ESSR</td><td style="padding:8px;border:1px solid var(--border-color);">서비스 입력시 헤더데이터</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>자재문서</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">MKPF</td><td style="padding:8px;border:1px solid var(--border-color);">자재전표 헤더</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>자재문서</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">MSEG</td><td style="padding:8px;border:1px solid var(--border-color);">자재전표 품목</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTEVR0030</td><td style="padding:8px;border:1px solid var(--border-color);">[EVR] 전자세금계산서 AR 데이터 Header 테이블</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTEVR0050</td><td style="padding:8px;border:1px solid var(--border-color);">[EVR] 전자세금계산서 AP 상태관리 Log</td><td style="padding:8px;border:1px solid var(--border-color);">세금계산서 이력</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTEVR0060</td><td style="padding:8px;border:1px solid var(--border-color);">[EVR] 전자세금계산서 AP 상태관리 Header</td><td style="padding:8px;border:1px solid var(--border-color);">세금계산서 헤더</td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTEVR0070</td><td style="padding:8px;border:1px solid var(--border-color);">[EVR] 전자세금계산서 AP 데이터 Header 테이블</td><td style="padding:8px;border:1px solid var(--border-color);">세금계산서 아이템</td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">ZTSBMMT0230</td><td style="padding:8px;border:1px solid var(--border-color);">[STP] 협력사 임시송장 결재 상세 내역</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">RBKP</td><td style="padding:8px;border:1px solid var(--border-color);">송장 헤더</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>IV</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">RSEG</td><td style="padding:8px;border:1px solid var(--border-color);">송장 품목</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-card);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>FI</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">BKPF</td><td style="padding:8px;border:1px solid var(--border-color);">회계전표 헤더</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-        '<tr style="background:var(--bg-secondary);"><td style="padding:8px;border:1px solid var(--border-color);"><strong>FI</strong></td><td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">BSEG</td><td style="padding:8px;border:1px solid var(--border-color);">회계전표 품목</td><td style="padding:8px;border:1px solid var(--border-color);"></td></tr>' +
-      '</tbody>' +
-    '</table>' +
-    
+    '<thead><tr style="background:linear-gradient(135deg, #6B9AC4, #5A8AB5);color:#fff;">' +
+    '<th style="padding:10px;border-radius:4px 0 0 0;">구분</th>' +
+    '<th style="padding:10px;">테이블</th>' +
+    '<th style="padding:10px;">테이블명</th>' +
+    '<th style="padding:10px;border-radius:0 4px 0 0;">설명</th></tr></thead><tbody>';
+  for (var i = 0; i < tables.length; i++) {
+    var bg = i % 2 === 0 ? 'var(--bg-secondary)' : 'var(--bg-card)';
+    html += '<tr style="background:' + bg + ';">' +
+      '<td style="padding:8px;border:1px solid var(--border-color);"><strong>' + tables[i].category + '</strong></td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">' + tables[i].code + '</td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);">' + tables[i].name + '</td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);">' + tables[i].desc + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildTcodeTableHtml(tcodes) {
+  if (!tcodes || tcodes.length === 0) return '';
+  var html =
+    '<h4 style="color:#333333;margin:16px 0 10px 0;font-size:15px;font-weight:700;">🔧 주요 T-Code 목록</h4>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-bottom:20px;">' +
+    '<thead><tr style="background:linear-gradient(135deg, #6B9AC4, #5A8AB5);color:#fff;">' +
+    '<th style="padding:10px;border-radius:4px 0 0 0;">구분</th>' +
+    '<th style="padding:10px;">T-Code</th>' +
+    '<th style="padding:10px;border-radius:0 4px 0 0;">내역</th></tr></thead><tbody>';
+  for (var i = 0; i < tcodes.length; i++) {
+    var bg = i % 2 === 0 ? 'var(--bg-secondary)' : 'var(--bg-card)';
+    html += '<tr style="background:' + bg + ';">' +
+      '<td style="padding:8px;border:1px solid var(--border-color);"><strong>' + tcodes[i].category + '</strong></td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">' + tcodes[i].code + '</td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);">' + tcodes[i].desc + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildTableListHtml(tables) {
+  if (!tables || tables.length === 0) return '';
+  var html =
+    '<h4 style="color:#333333;margin:16px 0 10px 0;font-size:15px;font-weight:700;">💾 주요 Table 목록</h4>' +
+    '<table style="width:100%;border-collapse:collapse;font-size:13px;">' +
+    '<thead><tr style="background:linear-gradient(135deg, #6B9AC4, #5A8AB5);color:#fff;">' +
+    '<th style="padding:10px;border-radius:4px 0 0 0;">구분</th>' +
+    '<th style="padding:10px;">테이블</th>' +
+    '<th style="padding:10px;">테이블명</th>' +
+    '<th style="padding:10px;border-radius:0 4px 0 0;">설명</th></tr></thead><tbody>';
+  for (var i = 0; i < tables.length; i++) {
+    var bg = i % 2 === 0 ? 'var(--bg-secondary)' : 'var(--bg-card)';
+    html += '<tr style="background:' + bg + ';">' +
+      '<td style="padding:8px;border:1px solid var(--border-color);"><strong>' + tables[i].category + '</strong></td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);font-family:monospace;">' + tables[i].code + '</td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);">' + tables[i].name + '</td>' +
+      '<td style="padding:8px;border:1px solid var(--border-color);">' + tables[i].desc + '</td></tr>';
+  }
+  html += '</tbody></table>';
+  return html;
+}
+
+function buildCompanyTableTcodeAnswer(companyKey) {
+  var data = COMPANY_TABLE_TCODE_DATA[companyKey];
+  if (!data) {
+    return '<div style="background:var(--info-bg-light, #E8F4FD);border-left:4px solid #2574A9;padding:16px;border-radius:8px;margin:16px 0;">' +
+      '죄송합니다. 요청하신 내용은 현재 등록된 지식에서 찾을 수 없습니다.</div>';
+  }
+  var companyName = data.name;
+
+  if (data.tcodes.length === 0 && data.tables.length === 0) {
+    return '<div style="background:var(--info-bg-light, #E8F4FD);border-left:4px solid #2574A9;padding:16px;border-radius:8px;margin:16px 0;">' +
+      '죄송합니다. 요청하신 내용은 현재 등록된 지식에서 찾을 수 없습니다.</div>';
+  }
+
+  var answer =
+    '<strong>📋 ' + companyName + ' Table & T-Code 가이드</strong><br/><br/>' +
+    buildTcodeTableHtml(data.tcodes) +
+    buildTableListHtml(data.tables) +
     '<br/><hr style="border:0;border-top:1px solid var(--border-color);margin:16px 0;">' +
     '<div style="font-size:12px;color:var(--text-muted);line-height:1.6;">' +
-    '📚 참고: 위 T-Code 와 Table 은 STP 모듈 관련 주요 항목입니다.<br/>' +
-    '🔍 더 상세한 정보는 SAP 시스템 내 도움말 또는 관련 매뉴얼을 참고해 주세요.' +
-    '</div>';
-    
-  return tableTcodeAnswer;
+    '📚 참고: 위 T-Code 와 Table 은 ' + companyName + ' 관련 주요 항목입니다.<br/>' +
+    '🔍 더 상세한 정보는 SAP 시스템 내 도움말 또는 관련 매뉴얼을 참고해 주세요.</div>';
+
+  return answer;
+}
+
+function buildTableTcodeAnswer() {
+  return buildCompanyTableTcodeAnswer('stp');
 }
 
 /* ============================================================
@@ -2892,8 +3089,7 @@ const NEW_COMPANY_KEYWORDS = ['신설법인 프로세스','신설법인프로세
 
 function isNewCompanyQuery(text) {
   // 담당자/연락처 키워드가 포함되면 프로세스가 아닌 담당자 연락처로 처리
-  const contactKeywords = ['담당자'];
-  if (contactKeywords.some(function(kw) { return text.includes(kw); })) {
+  if (isContactQuery(text)) {
     return false;
   }
   return NEW_COMPANY_KEYWORDS.some(function(kw) { return text.includes(kw); });
@@ -4572,6 +4768,35 @@ updateStats();
     }
   }
 
+  // Table & T-code 질문은 담당자 검색으로 잘못 흐르는 것을 방지
+  if (isTableTcodeQuery(text)) {
+    var companyKey = extractCompanyFromTableTcodeQuery(text);
+    
+    // STP 고정답변이 있는 경우만 즉시 응답
+    if (companyKey === 'stp') {
+      const startTime = Date.now();
+      const bubble = createAgentBubble('data');
+      if (bubble) bubble.innerHTML = buildCompanyTableTcodeAnswer(companyKey);
+      scrollBottom();
+      const elapsed = Date.now() - startTime;
+      state.stats.responseTimes.push(elapsed);
+      state.stats.pending   = Math.max(0, state.stats.pending - 1);
+      state.stats.resolved += 1;
+      updateStats();
+      const conv = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+      if (conv) conv.status = 'done';
+      return;
+    }
+    
+    // 나머지 그룹사는 DIFY AI로 전송 (Knowledge Base 검색)
+    // Table/T-code 질문이지만 고정답변 없는 경우 → DIFY로 바로 전송
+    const startTime_tt = Date.now();
+    const bubble_tt = createAgentBubble('data');
+    if (bubble_tt) bubble_tt.parentElement.parentElement.remove();
+    callAIAgent(text, 'data');
+    return;
+  }
+
   // 담당자 역할/직책 검색 (이름 검색보다 먼저 - "kt netcore PM 누구야?" 등)
   var roleResults = searchContactByRole(text);
   if (roleResults) {
@@ -4747,21 +4972,6 @@ updateStats();
     return;
   }
 
-  // Table & T-code 질문 감지 (우선순위 높음)
-  if (isTableTcodeQuery(text)) {
-    const startTime = Date.now();
-    const bubble = createAgentBubble('data');
-    if (bubble) bubble.innerHTML = buildTableTcodeAnswer();
-    scrollBottom();
-    const elapsed = Date.now() - startTime;
-    state.stats.responseTimes.push(elapsed);
-    state.stats.pending   = Math.max(0, state.stats.pending - 1);
-    state.stats.resolved += 1;
-    updateStats();
-    const conv = state.conversations.find(function(c) { return c.id === state.currentConvId; });
-    if (conv) conv.status = 'done';
-    return;
-  }
 
   // 신설법인 프로세스 질문 감지 (우선순위 높음)
   if (isNewCompanyQuery(text)) {
@@ -4780,8 +4990,6 @@ updateStats();
   }
 
   // SAP PO 조회 질문 감지 (우선순위 높음)
-  console.log('[DEBUG] Checking PO query:', text);
-  console.log('[DEBUG] isPOQuery result:', isPOQuery(text));
   if (isPOQuery(text)) {
     console.log('[DEBUG] PO query detected!');
     const poNumbers = extractPONumbers(text);
@@ -4902,6 +5110,26 @@ updateStats();
     const startTime = Date.now();
     const bubble = createAgentBubble('deploy');
     if (bubble) bubble.innerHTML = buildMMIntegrationAnswer();
+    scrollBottom();
+    const elapsed = Date.now() - startTime;
+    state.stats.responseTimes.push(elapsed);
+    state.stats.pending   = Math.max(0, state.stats.pending - 1);
+    state.stats.resolved += 1;
+    updateStats();
+    const conv = state.conversations.find(function(c) { return c.id === state.currentConvId; });
+    if (conv) conv.status = 'done';
+    return;
+  }
+
+  // Unknown Intent 처리 - 고정답변, Knowledge, Tool 모두 매칭 실패 시
+  if (isUnknownIntent(text)) {
+    const startTime = Date.now();
+    const bubble = createAgentBubble('etc');
+    if (bubble) {
+      bubble.innerHTML =
+        '<div style="background:var(--info-bg-light, #E8F4FD);border-left:4px solid #2574A9;padding:16px;border-radius:8px;margin:16px 0;">' +
+        '죄송합니다. 요청하신 내용은 현재 등록된 지식에서 찾을 수 없습니다.</div>';
+    }
     scrollBottom();
     const elapsed = Date.now() - startTime;
     state.stats.responseTimes.push(elapsed);
@@ -5454,7 +5682,7 @@ function setAIStatus(status) {
   if (!agentDesc) return;
 
   const statusMap = {
-    'idle':         { cls: 'status-idle',         icon: '🟢', text: '대기중' },
+    'idle':         { cls: 'status-idle',         icon: '🟢', text: '답변 준비중' },
     'generating':   { cls: 'status-generating',    icon: '🔵', text: '답변 생성중' },
     'analyzing':    { cls: 'status-analyzing',     icon: '🟣', text: '문서 분석중' },
     'searching':    { cls: 'status-searching',     icon: '🟡', text: 'Knowledge 검색중' }
@@ -5683,9 +5911,11 @@ document.addEventListener('DOMContentLoaded', function() {
   if (closePreviewBtn) {
     closePreviewBtn.addEventListener('click', hideExtractPreview);
   }
+  
   if (copyTextBtn) {
     copyTextBtn.addEventListener('click', copyExtractedText);
   }
+  
   if (applyTextBtn) {
     applyTextBtn.addEventListener('click', applyExtractedText);
   }
