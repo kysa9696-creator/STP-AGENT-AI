@@ -2683,6 +2683,7 @@ function buildSystemAnswer(systemType) {
       html: '<ul style="font-size:13px;line-height:2.0;color:var(--text-secondary);margin:0;">' +
         '<li><strong>BPM 개발:</strong> <a href="http://bpdev.kt.com:8103/bizflow/KTFBPM/ktf_login2.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpdev.kt.com:8103/bizflow/KTFBPM/ktf_login2.jsp</a></li>' +
         '<li><strong>BPM 품질:</strong> <a href="http://bpdev.kt.com/bizflow/KTFBPM/ktf_login2.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpdev.kt.com/bizflow/KTFBPM/ktf_login2.jsp</a></li>' +
+        '<li><strong>BPM 로그:</strong> <a href="http://bp.kt.com/bizflow/KTERPBPM/applications/EASYERP/log.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://bp.kt.com/bizflow/KTERPBPM/applications/EASYERP/log.jsp</a></li>' +
         '<li><strong>KT CLOUD BPM 개발:</strong> <a href="http://bpmdev.ktcloud.com/bizflow/KTFBPM/ktf_login_ext.jsp?Febbpm!02" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpmdev.ktcloud.com/bizflow/KTFBPM/ktf_login_ext.jsp?Febbpm!02</a></li>' +
         '<li><strong>KT CLOUD BPM 운영:</strong> <a href="http://bpm.ktcloud.com/bizflow/KTERPBPM/log/ds_log/ds_log.jsp" target="_blank" style="color:#2574A9;text-decoration:none;">http://bpm.ktcloud.com/bizflow/KTERPBPM/log/ds_log/ds_log.jsp</a></li>' +
         '</ul>'
