@@ -4,12 +4,12 @@
    Dark Theme: Pure Black AI SaaS
     ============================================================ */
 
-/* Custom Alpha Icon */
+/* Custom Alpha Icon - ?�문자 A ?�이�?*/
 .icon-alpha::before {
   content: 'A';
   font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
   font-weight: 800;
-  font-size: 1.2em;
+  font-size: 1em;
   line-height: 1;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -19,20 +19,37 @@
   text-align: center;
 }
 
-/* Custom KT DS Icon */
+/* Custom KT DS Icon - ?�스??기반 KT DS 로고 */
 .icon-ktds::before {
   content: 'ds';
   font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
   font-weight: 900;
-  font-size: 0.9em;
+  font-size: 1em;
   line-height: 1;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   display: inline-block;
-  width: 1.4em;
+  width: 1em;
   text-align: center;
   color: #FFFFFF; /* ?�색 */
+}
+
+/* Custom KT Icon - KT 알파벳 로고 */
+.icon-kt-group::before {
+  content: 'KT';
+  font-family: 'Inter', 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-style: normal;
+  font-size: 1em;
+  line-height: 1;
+  letter-spacing: 0.05em;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  display: inline-block;
+  width: auto;
+  text-align: center;
 }
 
 /* ---------- CSS Variables ---------- */
@@ -291,6 +308,14 @@ body.dark-theme .welcome-icon,
 body.dark-theme .pipeline-icon {
   background: transparent !important;
   box-shadow: none !important;
+}
+body.dark-theme .welcome-icon {
+  color: #fff !important;
+}
+
+/* Dark theme welcome icon color */
+body.dark-theme .welcome-icon {
+  color: #fff;
 }
 
 body.dark-theme .message-row.agent .msg-avatar {
@@ -1580,7 +1605,6 @@ input:focus, textarea:focus, select:focus { outline: none; }
   height: 100%;
   display: flex;
   align-items: center;
-  gap: 24px;
   padding: 0 24px;
 }
 
@@ -1590,9 +1614,10 @@ input:focus, textarea:focus, select:focus { outline: none; }
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  margin-right: auto !important;
 }
 .logo-icon {
-  width: 40px; height: 40px;
+  width: 36px; height: 36px;
   background: transparent;
   border-radius: var(--radius-md);
   display: flex; align-items: center; justify-content: center;
@@ -1603,12 +1628,58 @@ input:focus, textarea:focus, select:focus { outline: none; }
   color: #fff;
   box-shadow: none;
   transition: box-shadow var(--transition);
+  position: relative;
 }
 
 /* Light theme logo icon — AI orb style */
 body:not(.dark-theme) .logo-icon {
   background: transparent !important;
   box-shadow: none !important;
+}
+body:not(.dark-theme) .logo-icon .icon-kt-group {
+  color: #E60028;
+}
+body.dark-theme .logo-icon .icon-kt-group {
+  color: #FFFFFF;
+}
+
+/* Logo orb — mystical glowing sphere on KT icon */
+.logo-orb {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%,
+    rgba(255,255,255,0.95) 0%,
+    rgba(230,0,40,0.8) 25%,
+    rgba(139,92,246,0.6) 50%,
+    rgba(59,130,246,0.4) 75%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 6px 2px rgba(230,0,40,0.5),
+    0 0 12px 4px rgba(139,92,246,0.3),
+    inset 0 0 4px 1px rgba(255,255,255,0.4);
+  animation: orbFloat 3s ease-in-out infinite, orbGlow 2s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 2;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes orbFloat {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -55%) scale(1.15); }
+}
+
+@keyframes orbGlow {
+  0% {
+    box-shadow: 0 0 6px 2px rgba(230,0,40,0.5), 0 0 12px 4px rgba(139,92,246,0.3), inset 0 0 4px 1px rgba(255,255,255,0.4);
+  }
+  100% {
+    box-shadow: 0 0 10px 3px rgba(230,0,40,0.7), 0 0 20px 6px rgba(139,92,246,0.5), inset 0 0 6px 2px rgba(255,255,255,0.6);
+  }
 }
 
 @keyframes pulse {
@@ -1642,8 +1713,9 @@ body:not(.dark-theme) .logo-icon {
   display: flex;
   align-items: center;
   gap: 4px;
-  flex: 1;
-  justify-content: center;
+  flex: 1 !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
 }
 .nav-btn {
   display: flex; align-items: center; gap: 8px;
@@ -1668,6 +1740,7 @@ body:not(.dark-theme) .logo-icon {
 .header-user {
   display: flex; align-items: center; gap: 12px;
   flex-shrink: 0;
+  margin-left: auto !important;
 }
 
 /* Theme Toggle Button */
@@ -1879,9 +1952,55 @@ body:not(.dark-theme) .logo-icon {
 .tree-title {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   padding: 10px;
   cursor: pointer;
+}
+.tree-title i {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+  width: 18px;
+  text-align: center;
+}
+.tree-title span {
+  line-height: 1;
+  display: flex;
+  align-items: center;
+}
+body:not(.dark-theme) .tree-title i {
+  color: #333333;
+}
+body:not(.dark-theme) .group-company .tree-title i {
+  color: #E60028;
+  font-size: 16px;
+  line-height: 1;
+}
+body:not(.dark-theme) .group-company[data-company="netcore-pm"] .tree-title i {
+  color: #F472B6;
+}
+body:not(.dark-theme) .group-company[data-company="cloud"] .tree-title i {
+  color: #3B82F6;
+}
+body:not(.dark-theme) .group-company[data-company="alpha"] .tree-title i {
+  color: #8B5CF6;
+}
+body:not(.dark-theme) .group-company[data-company="skylife"] .tree-title i {
+  color: #10B981;
+}
+body:not(.dark-theme) .group-company[data-company="sat"] .tree-title i {
+  color: #F59E0B;
+}
+body:not(.dark-theme) .group-company[data-company="ds"] .tree-title i {
+  color: #E60028;
+}
+body:not(.dark-theme) .group-company[data-company="estate"] .tree-title i {
+  color: #06B6D4;
+}
+body:not(.dark-theme) .group-company[data-company="engineering"] .tree-title i {
+  color: #6366F1;
+}
+body:not(.dark-theme) .group-company[data-company="kt-group"] .tree-title i {
+  color: #E60028;
 }
 .tree-menu {
   display: none;
@@ -1997,7 +2116,7 @@ body:not(.dark-theme) .logo-icon {
 }
 .chat-info { display: flex; align-items: center; gap: 12px; }
 .agent-avatar {
-  width: 40px; height: 40px;
+  width: 36px; height: 36px;
   background: transparent;
   border-radius: var(--radius-md);
   display: flex; align-items: center; justify-content: center;
@@ -2062,11 +2181,11 @@ body:not(.dark-theme) .agent-avatar {
   transition: background-color var(--transition), border-color var(--transition);
 }
 .welcome-icon {
-  width: 48px; height: 48px;
+  width: 36px; height: 36px;
   background: transparent;
   border-radius: var(--radius-lg);
   display: flex; align-items: center; justify-content: center;
-  font-size: 20px; color: #fff;
+  font-size: 20px; color: var(--text-primary);
   font-weight: 800;
   letter-spacing: -0.5px;
   font-family: 'Segoe UI', 'Apple SD Gothic Neo', sans-serif;
@@ -2078,6 +2197,37 @@ body:not(.dark-theme) .agent-avatar {
 body:not(.dark-theme) .welcome-icon {
   background: transparent !important;
   box-shadow: none !important;
+}
+body:not(.dark-theme) .welcome-card .welcome-icon {
+  font-size: 26px;
+  color: #333333;
+}
+body:not(.dark-theme) .welcome-card[data-company="netcore-pm"] .welcome-icon {
+  color: #F472B6;
+}
+body:not(.dark-theme) .welcome-card[data-company="cloud"] .welcome-icon {
+  color: #3B82F6;
+}
+body:not(.dark-theme) .welcome-card[data-company="alpha"] .welcome-icon {
+  color: #8B5CF6;
+}
+body:not(.dark-theme) .welcome-card[data-company="skylife"] .welcome-icon {
+  color: #10B981;
+}
+body:not(.dark-theme) .welcome-card[data-company="sat"] .welcome-icon {
+  color: #F59E0B;
+}
+body:not(.dark-theme) .welcome-card[data-company="ds"] .welcome-icon {
+  color: #E60028;
+}
+body:not(.dark-theme) .welcome-card[data-company="estate"] .welcome-icon {
+  color: #06B6D4;
+}
+body:not(.dark-theme) .welcome-card[data-company="engineering"] .welcome-icon {
+  color: #6366F1;
+}
+body:not(.dark-theme) .welcome-card[data-company="kt-group"] .welcome-icon {
+  color: #E60028;
 }
 @keyframes float {
   0%, 100% { transform: translateY(0); }
